@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>GD Image Loader</title>
+        <link rel="stylesheet" href="style.css">
+        <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@600&display=swap" rel="stylesheet">
+        <script src="main.js" defer></script>
+    </head>
+    <body>
+        <div id="descriptionBox"></div>
+        <div class="title">GEOMETRY DASH IMAGE LOADER</div>
+        <div class="sub-title">CONFIGURATION SETTINGS</div>
+        <div class="header">If you are unsure what a setting will do or how it will affect the resulting image, just leave it as the default.</div>
+        <div class="property" style="font-weight:bold;">General settings: </div><br>
+        <div class="property">Path to image: </div> <div class="inputContainer">./<input type="text" class="input" id="imageInput" placeholder="image.extension"></div>
+        <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+            The file path to the image you want to load to Geometry Dash, relative to the location this program is stored.
+        `">?</div>
+        <br>
+        <div class="property">Create new level: </div><input type="checkbox" class="input-checkbox" id="newLevelInput">
+        <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+            Load image into a new Geometry Dash level.
+        `">?</div>
+        <br>
+        <div id="gdLevelContainer">
+            <div class="property">Geometry Dash level: </div> <div class="inputContainer"><input type="text" id="levelInput" class="input" placeholder="name"></div>
+            <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+                The name of the level you want to load the image into.
+            `">?</div>
+        </div>
+        <br>
+        <div class="property">Save location: </div> <div class="inputContainer">./saves/<input type="text" class="input" id="saveLocationInput" placeholder="save name"></div>
+        <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+            The location to save important data about the image build such as the build file and build stats.
+        `">?</div>
+        <br>
+        <div class="property">Save Image benchmarks: </div><input type="checkbox" class="input-checkbox" id="saveImages" checked>
+        <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+            Whether to save images from different stages of the process as well as a standard render of the input image.
+        `">?</div>
+        <br>
+        <div class="property">Quality optimization: </div><input type="checkbox" class="input-checkbox" id="lowObjectModeInput">
+        <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+            Prevent artifacting as much as posible<br>
+            without greatly impacing object count.<br>
+            This will lead to longer process times.
+        `">?</div>
+        <br>
+        <div class="property">Image scan resolution: </div> <div class="inputContainer"><input type="number" id="scanWidthInput" class="input" placeholder="width"></div><div style="font-family:'Space Mono', monospace;font-size:0.75cm;display:inline-block">x</div><div class="inputContainer"><input type="number" id="scanHeightInput" class="input" placeholder="height"></div>
+        <div class="description">
+            The resolution the image will be processed at. <br>
+            KEEP LOW!  200x112 recomended for horizontal images and 140x180 for vertical images<br><br>
+            <div style="background-color:rgba(80,50,100,0.35); display: inline-block;font-weight: bold;">This does not define the ending resolution! It does however determine the aspect ratio.</div><br>
+            Images will look better than the quality specified here, due to object optimization. <br>
+            This resolution affects how many objects will be used as well as how long it will take to process.
+        </div>
+        <br>
+        <div class="property" style="font-weight:bold;">Compression settings: </div><br>
+        <div class="property">Compression threshold (0-1): </div><div class="inputContainer"><input type="number" class="input" value="0.08" id="thresholdInput"></div>
+        <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+            The threshold to compress similar colors into the same color group<br>
+            higher = fewer objects<br>
+            lower = more detail
+        `">?</div>
+        <br>
+        <div class="property">Incorperate threshold (>=0): </div><div class="inputContainer"><input type="number" class="input" value="5" id="incorperateThresholdInput"></div>
+        <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+            When pixels are grouped together, often there will be some groups with only a few pixels.
+            This will combine groups with less than x pixels into another group.
+        `">?</div>
+        <br>
+        <div class="property">White is transparency: </div><input type="checkbox" class="input-checkbox" id="whiteTransparentInput">
+        <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+            This program does not directly support transparency for many reasons. <br>
+            This setting will remove all white colors if enabled. <br>
+        `">?</div>
+        <br>
+        <div class="property">Protect whites: </div><input type="checkbox" class="input-checkbox" id="protectWhitesInput">
+        <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+            This setting will prevent severe artifacting in white colors. <br>
+            It is strongly recomended when 'White is Transparency' is enabled.
+        `">?</div>
+        <br>
+        <div class="property" style="font-weight:bold;">Conversion settings: </div><br>
+        <div class="property">Overlap quality (0-1): </div><div class="inputContainer"><input type="number" class="input" value="0.45" id="overlapQualityInput"></div>
+        <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+            The starting scale of a solution<br>
+            higher = more detail<br>
+            lower = fewer objects<br>
+            This will be dynamicly scaled if 'Low object mode' is enabled.
+        `">?</div><br>
+        <div class="property">Pass threshold (0-1): </div><div class="inputContainer"><input type="number" class="input" value="0.45" id="passThresholdInput"></div>
+        <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+            The threshold a solution will be disregarded if there is too much overlap.<br>
+            higher = less artifacting, longer load times<br>
+            lower = fewer objects<br>
+            This will be dynamicly scaled if 'Low object mode' is enabled.
+        `">?</div><br>
+        <div class="error-text" id="errorOut"style="display:none;"></div>
+        <div id="startButton">Start</div>
+
+        <form action="submitConfig" method="post"  style="display:none;">
+            <input type="text" name="configSubmition" id="configSubmition">
+            <input type="submit" id="submitConfigInput">
+        </form>
+    </body>
+</html>
