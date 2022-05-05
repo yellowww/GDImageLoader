@@ -1,8 +1,8 @@
 
 <img src="github/assets/header.png" alt="title"></img>
-
-# An easy way to import images into Geometry Dash while preserving quality.
- ---
+---
+# <div align="center">An easy way to import images into Geometry Dash while preserving quality.</div>
+ 
  <br>
  <br>
 
@@ -12,10 +12,12 @@
 
  1. Download and unzip this repository or clone it to your computer
 
- 1. Open a command prompt and run `node 'fullPathToProgram' /main.js` to start the program.
+ 1. Open a command prompt and run `node 'absolutePath'/main.js` to start the program.<br>
+    You can get the absolute path by shift + right clicking the file and selecting "copy as path"
 
  1. Follow the prompts to load the image into your geometry dash level.
 <br>
+
 ---
 
 ## GDImageLoader:
@@ -27,17 +29,20 @@ This program optimizes the amount of objects used, as well as the quality of the
 It will try to turn groups of pixels into primitive objects, such as triangles, circles, and squares. This will ultimatly lead to a much lower object count, while still maintaining quality.
 
 <table>
-    <tr>
+    <tr width="500">
         <td align="center" width="50%">Standard render</td>
-        <td align="center" width="50%">Vector render<td>
+        <td align="center" width="50%">Vector render</td>
     </tr>
-    <tr align="center">
-        <td>
-        <img src="github/assets/standard.png" width="95%">
+    <tr width="500">
+        <td width="500" align="center">
+           <img src="github/assets/standard.png" width="95%">
         </td>
-        <td >
-        <img src="github/assets/PrimSet.png" width="95%">
+        <td align="center">
+           <img src="github/assets/PrimSet.png" width="95%">
         </td>
     </tr>
+    <td align="center" colspan="2">
+       Both of these use 3,826 objects
+    </td>
 </table>
 The results you get may vary based on your configuration. It may take some time tuning the values to maximize the efectiveness of this render system.
