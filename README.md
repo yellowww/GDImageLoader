@@ -1,22 +1,5 @@
-<style>
-    .imageRender {
-        width:40vw;
-        max-width:8cm;
-        text-align:center;
-        display:inline-block;
-        font-weight:bold;
-    }
 
-    .header {
-        width:100vw;
-    }
-    .imageRenderContainer {
-        width:90vw;
-        text-align:center;
-    }
-</style>
-
-<img src="github/assets/header.png" class="header" alt="title"></img>
+<img src="github/assets/header.png" alt="title"></img>
 
 # An easy way to import images into Geometry Dash while preserving quality.
  ---
@@ -34,6 +17,7 @@
  1. Follow the prompts to load the image into your geometry dash level.
 <br>
 ---
+
 ## GDImageLoader:
 
 Most other Geometry Dash image loaders use standard rendering, loading each pixel as a different object. This can cause massive lag with images that have high resolutions.
@@ -41,13 +25,19 @@ Most other Geometry Dash image loaders use standard rendering, loading each pixe
 This program optimizes the amount of objects used, as well as the quality of the image through raster vectorization. 
 <br>
 It will try to turn groups of pixels into primitive objects, such as triangles, circles, and squares. This will ultimatly lead to a much lower object count, while still maintaining quality.
-<div class="imageRenderContainer">
-    <div class="imageRender">Standard render</div>
-    <div class="imageRender">Vector render</div>
-    <img src="github/assets/standard.png" class="imageRender"></img>
-    <img src="github/assets/primset.png" class="imageRender"></img>
-    <div>Both these images use 3826 objects</div>
-</div>
-<br>
 
+<table>
+    <tr>
+        <td align="center" width="50%">Standard render</td>
+        <td align="center" width="50%">Vector render<td>
+    </tr>
+    <tr align="center">
+        <td>
+        <img src="github/assets/standard.png" width="95%">
+        </td>
+        <td >
+        <img src="github/assets/PrimSet.png" width="95%">
+        </td>
+    </tr>
+</table>
 The results you get may vary based on your configuration. It may take some time tuning the values to maximize the efectiveness of this render system.
