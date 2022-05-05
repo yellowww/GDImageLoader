@@ -1,8 +1,6 @@
 const Jimp = require("jimp");
 const { createCanvas } = require("canvas");
 const fs = require("fs");
-const { group } = require("console");
-const Buffer = require("buffer").Buffer;
 const router = require("./router.js");
 let ctx,canvas;
 

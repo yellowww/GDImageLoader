@@ -45,4 +45,7 @@ It will try to turn groups of pixels into primitive objects, such as triangles, 
        Both of these use 3,826 objects
     </td>
 </table>
+
+> View [config](github/assets/catExample) used to create these images 
+
 The results you get may vary based on your configuration. It may take some time tuning the values to maximize the efectiveness of this render system.
