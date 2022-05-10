@@ -2,6 +2,7 @@ const Jimp = require("jimp");
 const { createCanvas } = require("canvas");
 const fs = require("fs");
 const router = require("./router.js");
+const builder = require("./build.js");
 let ctx,canvas;
 
 
@@ -21,6 +22,7 @@ let config = {
     overlapQuality:0.45, //0.9 defines the starting resolution of the solution, will be scaled if low object count is enabled
     passThreshold:0.55, //0.75 the threshold at which a solution will be disregarded if there is too much overlap
     lowObjectCount:true,
+    bakeArtifacts:false,
     protectWhites:true, // prevent artifacts in white colors (rgb>config.whiteThreshold) useful when removeing white
     whiteIsTransparency:true,
     cleanUpNonMerged:true, // true = replace single pixels with neighbors, false = create new group for every single pixel
@@ -31,6 +33,7 @@ const grouping = {
     groups:[],
     links:[],
     objs:[],
+    objLinkers:[],
     bounded:[],
     finsishedPrimitives:[],
     relativePrimatives:[],
@@ -43,6 +46,15 @@ const grouping = {
             container[i] = nested;
         }
         grouping.links = container;
+    },
+    initObjLinks:() => {
+        const container = new Array(config.res[0]);
+        for(let i=0;i<container.length;i++) {
+            const nested = new Array(config.res[1]);
+            nested.fill(-1);
+            container[i] = nested;
+        }
+        grouping.objLinkers = container;
     },
     scalePrimitives:(amount) => {
         for(let i=0;i<grouping.finsishedPrimitives.length;i++) {
@@ -88,7 +100,7 @@ const grouping = {
                 const newPrim = {
                     x:thisPrim.x/config.res[0],
                     y:thisPrim.y/config.res[0],
-                    size:thisPrim.size*(config.res[0]/100),
+                    size:thisPrim.size*(config.res[0]/config.assetRes),
                     color:thisPrim.color,
                     name:thisPrim.name
                 }
@@ -305,6 +317,7 @@ const compress = {
         process.stdout.write("\x1b[1mRepairing missing data\x1b[0m - Done!\n");
     },
     convertToGroupObjs:(cb) => {
+        grouping.initObjLinks();
         process.stdout.write("\n\n\n");
         grouping.objs = [];
         for(let i=0;i<grouping.groups.length;i++) {
@@ -321,7 +334,8 @@ const compress = {
             const color = grouping.groups[i];
             const refs = compress.findAllRefs(i);
             if(refs.length>0) {
-               grouping.objs.push({color:color,pixels:refs}); 
+                for(let i=0;i<refs.length;i++) grouping.objLinkers[refs[i][0]][refs[i][1]] = grouping.objs.length;
+                grouping.objs.push({color:color,pixels:refs}); 
             }
         }
         process.stdout.write("\r\x1b[K");
@@ -348,6 +362,15 @@ const compress = {
             if(grouping.objs[i].pixels.length<config.incorperateThreshold) {
                 const thisPixel = grouping.objs[i].pixels[0];
                 const closestGroupI = compress.findNearestGroup(thisPixel[0],thisPixel[1]);
+                for(let j=0;j<grouping.objs[i].pixels.length;j++) { // transfer linkers
+                    const thisPx = grouping.objs[i].pixels[j];
+                    grouping.objLinkers[thisPx[0]][thisPx[1]] = closestGroupI;
+                }
+                for(let j=0;j<grouping.objLinkers.length;j++) {
+                    for(let k=0;k<grouping.objLinkers[j].length;k++) {
+                        if(grouping.objLinkers[j][k]>=i) grouping.objLinkers[j][k]--;
+                    }
+                }
                 grouping.objs[closestGroupI].pixels = grouping.objs[closestGroupI].pixels.concat(grouping.objs[i].pixels);
                 grouping.objs.splice(i,1);
                 i--;
@@ -605,15 +628,16 @@ let terminal = {
 
         const currentObjects = thread.currentObjects;
         const totalObjects = Math.round(currentObjects/exactPixelPercent);
+        const progressString =  "\x1b[1m\x1b[4mVectorizing Image...\x1b[0m   Working Time:  "+formattedTime+
+            "   Estimated Time remaining: "+terminal.formatTime(estimatedTime)+
+            "  |  Current objects: "+ currentObjects+"   Estimated total objects: "+totalObjects;
+        const numOfLines = Math.ceil(progressString.length/process.stdout.columns);
         process.stdout.write("\r\x1b[K");
         process.stdout.write("\033[F\r\x1b[K");
         process.stdout.write("\033[F\r\x1b[K");
-        process.stdout.write("\033[F\r\x1b[K");
-
+        for(let i=0;i<numOfLines;i++) process.stdout.write("\033[F\r\x1b[K");
         process.stdout.write(
-            "\x1b[1m\x1b[4mVectorizing Image...\x1b[0m   Working Time:  "+formattedTime+
-            "   Estimated Time remaining: "+terminal.formatTime(estimatedTime)+
-            "  |  Current objects: "+ currentObjects+"   Estimated total objects: "+totalObjects+"\n"+
+            progressString+"\n"+
             terminal.createProgressBar(thread.currentGroupIndex/grouping.bounded.length,50)+" "+percent+
             "% of "+grouping.bounded.length+" groups solved\n"+
             terminal.createProgressBar(thread.currentPixelsScanned/(config.res[0]*config.res[1]),50)+" "+pixelPercent+
@@ -678,7 +702,7 @@ let solutions = {
         solutions.currentGroupSolutions = [];
         let lastTime = 0;
         let groupCopy = {minX:group.mixX,maxX:group.maxX,minY:group.minY,maxY:group.maxY,color:group.color,binary:group.binary.slice()};
-        let totalOverlap = 0;
+        let totalOverlap = [];
         for(let i=0;i<1000;i++) {
             const inclusions = solutions.getInclusions(groupCopy);
             if(inclusions == 0) break;
@@ -688,8 +712,7 @@ let solutions = {
             const solution = solutions.tryAllAssets(groupCopy);
             solution.res.color = group.color;
             solutions.cutFromGroup(groupCopy,solution.res);
-            totalOverlap += solution.overflow;
-
+            totalOverlap = totalOverlap.concat(solution.overflow);
             solutions.currentGroupSolutions.push(solution.res);
             thread.currentPixelsScanned+=inclusions-solutions.getInclusions(groupCopy);
             thread.currentObjects++;
@@ -698,11 +721,18 @@ let solutions = {
             }
             lastTime = new Date().getTime();
         }
+        for(let i=0;i<totalOverlap.length;i++) {
+            totalOverlap[i].x+=group.minX;
+            totalOverlap[i].y+=group.minY;
+        }
+        if(config.bakeArtifacts) {
+            solutions.cutPixelsFromBounded(totalOverlap);
+        }
         for(let i=0;i<solutions.currentGroupSolutions.length;i++) {
             solutions.currentGroupSolutions[i].x+=group.minX;
             solutions.currentGroupSolutions[i].y+=group.minY;
         }
-        cb({solutions:solutions.currentGroupSolutions,totalOverlap:totalOverlap});
+        cb({solutions:solutions.currentGroupSolutions,totalOverlap:totalOverlap.length});
 
     },
     tryAllAssets:(group,pass,scoreMin,quality,lastScore,lastOverflow,callStack) => {
@@ -733,7 +763,7 @@ let solutions = {
             if(score.overlap == 0) score.overlap = 1;
             let finalScore = score.score-(score.overlap*1)+10000;
             if(score.score == 0) finalScore = -Infinity;
-            if(finalScore>bestResultScore) {bestResult = {res:result,overflow:score.overlap};scores={score:score.score,overlap:score.overlap};bestResultScore=finalScore};
+            if(finalScore>bestResultScore) {bestResult = {res:result,overflow:solutions.getAllOverlap(group,result)};scores={score:score.score,overlap:score.overlap};bestResultScore=finalScore};
             
         }
         if(callStack>=config.maxCallback) return bestResult;
@@ -884,6 +914,17 @@ let solutions = {
         if(j>array[i].length-1) return false;
         return array[i][j];
     },
+    cutPixelsFromBounded:(pixels) => {
+        for(let i=0;i<pixels.length;i++) {
+            if(pixels[i].x>=0 && pixels[i].y>=0 && pixels[i].x<config.res[0] && pixels[i].y<config.res[1]) {
+                const link = grouping.objLinkers[pixels[i].x][pixels[i].y];
+                let boundedGroup = grouping.bounded[link];
+                const rx = pixels[i].x-boundedGroup.minX, ry = pixels[i].y-(boundedGroup.minY);
+                boundedGroup.binary[rx][ry] = false;                
+            }
+
+        }
+    },
     scaleSolution:(solution) => {
         let scaled = [];
         for(let i=0;Math.round(i)<solution.asset.length;i+=1/solution.size) {
@@ -905,6 +946,21 @@ let solutions = {
             minY:minY,
             maxY:maxY,
         };
+    },
+    getAllOverlap:(group,solution) => {
+        const scaledSolution = solutions.scaleSolution(solution);
+        const bounds = solutions.getSolutionBounds(group,scaledSolution);
+        let overlaping = [];
+        for(let i = bounds.minX;i<=bounds.maxX;i++) {
+            for(let j = bounds.minY;j<=bounds.maxY;j++) {
+                const groupPos = solutions.getSafeValue(group.binary, i, j);
+                const assetPos = solutions.getSafeValue(scaledSolution.asset, i-scaledSolution.x, j-scaledSolution.y);
+                if(!groupPos && assetPos) {
+                    overlaping.push({x:i,y:j});
+                }
+            }
+        }
+        return overlaping;
     },
     getInclusions:(group) => {
         let amountOfInclusions=0;
@@ -934,7 +990,7 @@ let solutions = {
             } 
         }
         return foundPixels;
-    } 
+    }
 }
 
 exports.start = thread.loadAndInit;

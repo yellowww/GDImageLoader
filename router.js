@@ -28,4 +28,4 @@ app.post("/submitConfig", (req,res) => {
 });
 
 console.log("\n\x1b[1m\x1b[36m\n   -------------------\n   | GD Image Loader |\n   -------------------\x1b[0m\n")
-app.listen(2000, () => console.log('\x1b[33m   Navigate to http://localhost:2000 to enter configuration\x1b[0m'));
+app.listen(2000, () => console.log('\x1b[33m   Navigate to http://localhost:2000 in a web browser to enter configuration\x1b[0m'));

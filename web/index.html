@@ -88,15 +88,21 @@
             The starting scale of a solution<br>
             higher = more detail<br>
             lower = fewer objects<br>
-            This will be dynamicly scaled if 'Low object mode' is enabled.
+            This will be dynamicly scaled if 'Quality optimization' is enabled.
         `">?</div><br>
         <div class="property">Pass threshold (0-1): </div><div class="inputContainer"><input type="number" class="input" value="0.45" id="passThresholdInput"></div>
         <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
             The threshold a solution will be disregarded if there is too much overlap.<br>
             higher = less artifacting, longer load times<br>
             lower = fewer objects<br>
-            This will be dynamicly scaled if 'Low object mode' is enabled.
+            This will be dynamicly scaled if 'Quality optimization' is enabled.
         `">?</div><br>
+        <div class="property">Bake artifacts: </div><input type="checkbox" class="input-checkbox" id="bakeArtifactsInput">
+        <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+            Artifacts will override correct pixel data, <br>
+            leading to fewer groups, but a lower quality. <br>
+            Do not use this with a white background, it will lead to major artifacting.
+        `">?</div>
         <div class="error-text" id="errorOut"style="display:none;"></div>
         <div id="startButton">Start</div>
 

@@ -73,6 +73,7 @@ const compileJSON = () => {
     const overlapQuality = document.getElementById("overlapQualityInput").value;  
     const passThreshold = document.getElementById("passThresholdInput").value;  
     const newLevel = document.getElementById("newLevelInput").checked;  
+    const bakeArtifacts = document.getElementById("bakeArtifactsInput").checked;
     if(newLevel) level = "NA";
     const isNull = checkIfNull([
         ["path to image",image],
@@ -109,6 +110,7 @@ const compileJSON = () => {
         overlapQuality:Number(overlapQuality), //0.9 defines the starting resolution of the solution, will be scaled if low object count is enabled
         passThreshold:Number(passThreshold), //0.75 the threshold at which a solution will be disregarded if there is too much overlap
         lowObjectCount:lowObjectMode,
+        bakeArtifacts:bakeArtifacts,
         protectWhites:protectWhites, // prevent artifacts in white colors (rgb>config.whiteThreshold) useful when removeing white
         whiteIsTransparency: whiteIsTransparency,
         cleanUpNonMerged:true, // true = replace single pixels with neighbors, false = create new group for every single pixel
