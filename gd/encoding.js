@@ -31,7 +31,7 @@ const encodeSave = (data) => {
     gzip = gzip.replace(/\//g, "_");
     gzip = gzip.replace(/\+/g, "-");
     const xor = crypto.xor(gzip,11);
-    console.log(xor.length);
+    console.log(`\x1b[36m\x1b[1mUpdated GD save files\x1b[0m\x1b[36m | size: \x1b[34m${Math.round(xor.length/1000)}kb\x1b[0m`);
     fs.writeFile(gdSave, xor, (err) => {if(err)console.log(err)});
     fs.writeFile(gdSave2, xor, (err) => {if(err)console.log(err)});
     return xor;

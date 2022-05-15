@@ -100,7 +100,7 @@ const grouping = {
                 const newPrim = {
                     x:thisPrim.x/config.res[0],
                     y:thisPrim.y/config.res[0],
-                    size:thisPrim.size*(config.res[0]/config.assetRes),
+                    size:thisPrim.size*(config.assetRes/config.res[0]),
                     color:thisPrim.color,
                     name:thisPrim.name
                 }
@@ -930,7 +930,9 @@ let solutions = {
         for(let i=0;Math.round(i)<solution.asset.length;i+=1/solution.size) {
             let scaledColumn = [];
             for(let j=0;Math.round(j)<solution.asset[0].length;j+=1/solution.size) {
-                scaledColumn.push(solution.asset[Math.round(i)][Math.round(j)]);
+                if(Math.ceil(i)>=solution.asset.length) i=solution.asset.length-1;
+                if(Math.ceil(j)>=solution.asset[0].length) j=solution.asset[0].length-1;
+                scaledColumn.push(solution.asset[Math.ceil(i)][Math.ceil(j)]);
             }
             scaled.push(scaledColumn);
         }

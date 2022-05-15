@@ -11,11 +11,9 @@ module.exports = class crypto {
 
     decode(data) { 
         if (data.startsWith('<?xml version="1.0"?>')) return data;
-        console.log(data.length);
         let decoded = this.xor(data, 11);
         decoded = Buffer.from(decoded, 'base64');
-        //console.log(decoded.toString('base64'));
-        try { return zlib.unzipSync(decoded).toString() }
+        try {return zlib.unzipSync(decoded).toString();}
         catch (e) { return console.log("Error! GD save file seems to be corrupt!") }
     }
 
