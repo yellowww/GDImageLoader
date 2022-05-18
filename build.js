@@ -14,6 +14,22 @@ let build = {
     decodedLevel:undefined,
     parsedObjs:undefined,
     colorChannel:undefined,
+    backup:(saveName,levelName,newLevel,cb) => {
+        let gdSave = process.env.HOME || process.env.USERPROFILE + "/AppData/Local/GeometryDash/CCLocalLevels.dat";
+        fs.readFile(gdSave, "utf-8", (err,data) => {
+            if(err) {console.error("Could not cache backup, GD file not found.");return};
+            const fileName = (new Date().getTime()-1652751057920);
+            fs.writeFile(__dirname+"/cache/"+fileName+".dat", data, err=>{if(err)console.error(err)});
+            let key = JSON.parse(fs.readFileSync(__dirname+"/cache/key.json"));
+            key[fileName] = {
+                timeCreated:new Date().getTime(),
+                saveName:saveName,
+                levelName:newLevel? "new level":levelName
+            };
+            fs.writeFileSync(__dirname+"/cache/key.json",JSON.stringify(key));
+            cb();
+        })
+    },
     loadBuildFile:(file,cb) => {
         fs.readFile(file, 'utf-8', (err,data) => {
             if(err) {console.error(err);return};
@@ -24,58 +40,70 @@ let build = {
         });
     },
     loadIntoLevel:(save,newLevel,levelName, width,layer) => {
-        process.stdout.write(`\x1b[37m\x1b[1mLoading ./saves/${save}/ConstructFile.gdi...\x1b[0m`);
+        process.stdout.write(`\x1b[37m\x1b[1mLoading ${save}/ConstructFile.gdi...\x1b[0m`);
 
-        build.loadBuildFile(`./saves/${save}/ConstructFile.gdi`, () => {
+        build.loadBuildFile(`${save}/ConstructFile.gdi`, () => {
             process.stdout.write("\r\x1b[K");
-            process.stdout.write(`\x1b[37m\x1b[1mLoading ./saves/${save}/ConstructFile.gdi\x1b[0m - Done!\n\n`);
+            process.stdout.write(`\x1b[37m\x1b[1mLoading ${save}/ConstructFile.gdi\x1b[0m - Done!\n\n`);
             process.stdout.write("Decoding GD save file...");
             gd.decodeLevel((xml) => {
                 process.stdout.write("\r\x1b[K");
                 process.stdout.write("\x1b[1mDecoding GD save file\x1b[0m - Done!\n\n");
-                const levelData = build.getSingleLevel(levelName, xml);
-                build.parsedObjs = levelData.split(';');
-                build.parsedObjs = [];
-                let totalObjects = 0;
-                let maxHeight = -Infinity;
-                for(let i=0;i<build.data.length;i++) for(let j=0;j<build.data[i].length;j++) {totalObjects++;if((build.data[i][j].y)*width>maxHeight) maxHeight = (build.data[i][j].y)*width}; 
-                const objectDensity = totalObjects/(width*maxHeight);
-                let targetDensity = false;
-                if(objectDensity>0.645)    {
-                    targetDensity = 0.63;
-                    process.stdout.write("\x1b[33m\x1b[1m[WARNING] \x1b[0m\x1b[33m- Object density too high, decreasing render resolution...\x1b[0m\n\n");
-                }
-                if(targetDensity) {
-                    let remainingObjects = totalObjects;
-                    for(let i=build.data.length-1;i>=0;i-=2) {
-                        remainingObjects-=build.data[i].length;
-                        build.data.splice(i,1);
-                        if(remainingObjects/(width*maxHeight)<targetDensity) break;
-                    }
-                }
-                let adjustedTotalObjects = 0;
-                for(let i=0;i<build.data.length;i++) {
-                    for(let j=0;j<build.data[i].length;j++) {
-                        adjustedTotalObjects++;
-                        build.addBuildObject(build.data[i][j],width,i,layer);
-                    }
-                }
-                let displayName = newLevel ? save:levelName;
-                console.log("\x1b[1mSucsesfully added\x1b[0m\x1b[35m "+adjustedTotalObjects+"\x1b[0m\x1b[1m objects to \x1b[0m\x1b[35m'"+displayName+"'\x1b[1m\x1b[0m.\x1b[0m");
-                build.compressToGDFormat();
-                
+                process.stdout.write("\x1b[1mBacking up previous files\x1b[0m");
+                let displayName = newLevel ? "Image To GD":levelName;
+                build.backup(save,displayName,newLevel,() => {
+                    process.stdout.write("\r\x1b[K");
+                    process.stdout.write("\x1b[1mBacking up previous files\x1b[0m - Done!\n\n");
+                    build.getSingleLevel(levelName, xml,newLevel);
+                    build.getMaxHeight(width,(maxHeight,totalObjects) => {
+                        const objectDensity = totalObjects/(width*maxHeight);
+                        let targetDensity = false;
+                        if(objectDensity>0.8)    {
+                            targetDensity = 0.078;
+                            process.stdout.write("\x1b[33m\x1b[1m[WARNING] \x1b[0m\x1b[33m- Object density too high, decreasing render resolution...\nTo get a better result, decrease the quality the image is processed at in the configurator.\x1b[0m\n\n");
+                        }
+                        if(targetDensity) {
+                            let remainingObjects = totalObjects;
+                            for(let i=build.data.length-1;i>=0;i-=2) {
+                                remainingObjects-=build.data[i].length;
+                                build.data.splice(i,1);
+                                if(remainingObjects/(width*maxHeight)<targetDensity) break;
+                            }
+                        }
+                        let adjustedTotalObjects = 0;
+                        for(let i=0;i<build.data.length;i++) {
+                            for(let j=0;j<build.data[i].length;j++) {
+                                adjustedTotalObjects++;
+                                build.addBuildObject(build.data[i][j],width,maxHeight,i,layer);
+                            }
+                        }
+                        
+                        console.log("\x1b[1mSucsesfully added\x1b[0m\x1b[35m "+adjustedTotalObjects+"\x1b[0m\x1b[1m objects to \x1b[0m\x1b[35m'"+displayName+"'\x1b[1m\x1b[0m.\x1b[0m");
+                        build.compressToGDFormat();                          
+                    });
+                });
             });
         });
     },
-    addBuildObject:(thisObject, width,i,layer) => {
+    getMaxHeight:(width,cb) => {
+        let maxHeight = -Infinity,totalObjects = 0;
+        for(let i=0;i<build.data.length;i++) {
+            for(let j=0;j<build.data[i].length;j++) {
+                totalObjects++;
+                if((build.data[i][j].y)*width>maxHeight) maxHeight = (build.data[i][j].y)*width;
+            }
+        }
+        cb(maxHeight,totalObjects);
+    },
+    addBuildObject:(thisObject, width,maxHeight,z,eLayer) => {
 
         const pxToGD = 30;        
-        let scale = (thisObject.size*width/pxToGD)+0.05;
+        let scale = (thisObject.size*width/pxToGD)*1.7;
         thisObject.x+=thisObject.size/2;
         thisObject.y+=thisObject.size/2;
         const centerX = (thisObject.x)*width, centerY = (thisObject.y)*width;
         const adjX = centerX, adjY = (centerY*-1);
-        let x = (adjX)+400, y = (adjY)+400,  color = thisObject.color;
+        let x = (adjX)+400, y = (adjY)+100+maxHeight,  color = thisObject.color;
         let name, rotation = 0;
         if(thisObject.asset == "square.png") name = "square";
         if(thisObject.asset == "diamond.png") name = "diamond";
@@ -95,34 +123,60 @@ let build = {
             name = "tri";
             rotation = 0;
         } 
-        build.addObj(name, x, y, scale, rotation, color,layer);
+        build.addObj(name, x, y, scale, rotation, color,z,eLayer);
     },
-    getSingleLevel:(level,data) => {
-        let dataCpy = data.slice();
-        let split = dataCpy.split("<k>k2</k>");
-        let allNames = [];
-        for(let i=1;i<split.length;i++) allNames.push({name:split[i].split("<s>")[1].split("</s>")[0],data:split[i]});
-        if(!allNames.map(e=>e.name).includes(level)) {
-            console.error(`Level '${level}' not found.`);
-            process.exitCode = 1;
-            process.exit();
-        }
-        dataCpy = build.cutAtChar(dataCpy, "<k>k2</k><s>"+level);
-        if(build.getRemoved(dataCpy, "k4</k><s>").includes("<k>k2</k>")) { // has no object data tag.
-            dataCpy = build.cutAtChar(dataCpy, "</s>");
-            dataCpy = "<k>k4</k><s>H4sIAAAAAAAACqWQ0Q3CMAxEFwqSz3HSVHx1Bga4AboCwxPH8JfSIn7uEtv3ZHl_5JZAEyqhhZlaCoEwDYui8QZWQkS4EERxaRQ24gkOhOg1BP5HrFOEz0TgEkTp-RnIr_EByRmmHGLkl23qIUb7W4f2DOwMZHNIhkO69vlcv0PmBPM15MJJJvG0b8hJ3EpYDbPUNd5LVN7W3B55HT8dGoDR2GxodCFhSHJ_AblH157VAgAA</s><k>k5</k><s>Player</s><k>k34</k><s>H4sIAAAAAAAACzPUszCytgYAYgPcnwYAAAA=</s>"+dataCpy;
-            data = build.getRemoved(data, "<k>k2</k><s>"+level+"</s>")+dataCpy;
+    getSingleLevel:(level,data,newLevel) => {
+        if(newLevel){
+            let allKeys = data.split("<k>");
+            allKeys = allKeys.map(e=>{return{name:e.split("</k>")[0],sIndex:data.indexOf(e)}});
+            for(let i=0;i<allKeys.length;i++) {
+                if(allKeys[i].name.includes("k_")) {
+                    const newVal = "k_"+(Number(allKeys[i].name.split('k_')[1])+1);
+                    data = build.setCharAt(data,allKeys[i].sIndex,newVal);
+                }
+            }
+            const defaultData = fs.readFileSync(__dirname+"/gd/defaultData/level.txt", "utf-8");
+            data = data.replace(
+                "<k>LLM_01</k><d><k>_isArr</k><t />",
+                "<k>LLM_01</k><d><k>_isArr</k><t />"+defaultData
+            );
+            build.remainingData = data;
+            build.remainingParsedData = fs.readFileSync(__dirname+"/gd/defaultData/parsedInfo.txt", "utf-8")
+            build.addColorChannel();
+            build.parsedObjs = [];
+        } else {
+            let dataCpy = data.slice();
+            let split = dataCpy.split("<k>k2</k>");
+            let allNames = [];
+            for(let i=1;i<split.length;i++) allNames.push({name:split[i].split("<s>")[1].split("</s>")[0],data:split[i]});
+            if(!allNames.map(e=>e.name).includes(level)) {
+                console.error(`Level '${level}' not found.`);
+                process.exitCode = 1;
+                process.exit();
+            }
+            dataCpy = build.cutAtChar(dataCpy, "<k>k2</k><s>"+level);
+            if(build.getRemoved(dataCpy, "k4</k><s>").includes("<k>k2</k>")) { // has no object data tag.
+                dataCpy = build.cutAtChar(dataCpy, "</s>");
+                dataCpy = "<k>k4</k><s>H4sIAAAAAAAACqWQ0Q3CMAxEFwqSz3HSVHx1Bga4AboCwxPH8JfSIn7uEtv3ZHl_5JZAEyqhhZlaCoEwDYui8QZWQkS4EERxaRQ24gkOhOg1BP5HrFOEz0TgEkTp-RnIr_EByRmmHGLkl23qIUb7W4f2DOwMZHNIhkO69vlcv0PmBPM15MJJJvG0b8hJ3EpYDbPUNd5LVN7W3B55HT8dGoDR2GxodCFhSHJ_AblH157VAgAA</s><k>k5</k><s>Player</s><k>k34</k><s>H4sIAAAAAAAACzPUszCytgYAYgPcnwYAAAA=</s>"+dataCpy;
+                data = build.getRemoved(data, "<k>k2</k><s>"+level+"</s>")+dataCpy;
+            }
+
+            dataCpy = build.cutAtChar(dataCpy, "k4</k><s>");
+            dataCpy = build.cutToChar(dataCpy, "</s>");
+            build.remainingData = data.replace(dataCpy,"[[PARSEDCONTAINER]]");            
+            let decoded = Buffer.from(dataCpy,'base64');
+            decoded = zlib.unzipSync(decoded).toString();
+            build.remainingParsedData = build.cutToChar(decoded,"kA11,0;")+"kA11,0;";
+            decoded = build.cutAtChar(decoded, "kA11,0;");
+            build.addColorChannel();
+            build.parsedObjs = decoded.split(';');
+            build.parsedObjs = [];
         }
 
-        dataCpy = build.cutAtChar(dataCpy, "k4</k><s>");
-        dataCpy = build.cutToChar(dataCpy, "</s>");
-        build.remainingData = data.replace(dataCpy,"[[PARSEDCONTAINER]]");            
-        let decoded = Buffer.from(dataCpy,'base64');
-        decoded = zlib.unzipSync(decoded).toString();
-        build.remainingParsedData = build.cutToChar(decoded,"kA11,0;")+"kA11,0;";
-        decoded = build.cutAtChar(decoded, "kA11,0;");
-        build.addColorChannel();
-        return decoded;
+    },
+    setCharAt:(str,index,chr) => {
+        if(index > str.length-1) return str;
+        return str.substring(0,index) + chr + str.substring(index+chr.length);
     },
     addColorChannel:() => {
         let cut = build.cutAtChar(build.remainingParsedData, "kS38,");
@@ -178,7 +232,7 @@ let build = {
         copy.splice(startIndex,string.length-startIndex);
         return copy.join('');
     },
-    addObj:(type,_x,_y,_scale,_rot,rgb,layer) => {
+    addObj:(type,_x,_y,_scale,_rot,rgb,z,layer) => {
         let x=_x, y=_y;
         let scale = _scale;
         let rot = _rot;
@@ -193,7 +247,7 @@ let build = {
         if(type=="tri") {id=693};
         scale = Math.round(scale*1000)/1000;
         build.parsedObjs.pop();
-        build.parsedObjs.push(`1,${id},2,${x},3,${y},5,1,6,${rot},32,${scale},41,1,43,${hsv},25,${layer},5,true,21,${build.colorChannel},20,${layer}`);
+        build.parsedObjs.push(`1,${id},2,${x},3,${y},5,1,6,${rot},32,${scale},41,1,43,${hsv},25,${z},5,true,21,${build.colorChannel},20,${layer}`);
         build.parsedObjs.push('');
     },
     rgbToHsvString: (r,g,b) => {
@@ -248,7 +302,7 @@ let build = {
 }
 
 
-
+exports.loadConstruct = build.loadIntoLevel;
 setTimeout(()=> {
-    build.loadIntoLevel("pospos",false,"color test",10,5);
+    //build.loadIntoLevel("./saves/cat",true,"Image To GD",150,1);
 },50)

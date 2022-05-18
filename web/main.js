@@ -36,6 +36,11 @@ document.getElementById("passThresholdInput").onblur = () => {
     if (input.value<0) input.value=0;
 }
 
+document.getElementById("layerInput").onblur = () => {
+    const input = document.getElementById("layerInput");
+    if (input.value<0) input.value=0;
+}
+
 document.getElementById("startButton").onclick = () => {
     const json = compileJSON();
     if(json) {
@@ -74,6 +79,8 @@ const compileJSON = () => {
     const passThreshold = document.getElementById("passThresholdInput").value;  
     const newLevel = document.getElementById("newLevelInput").checked;  
     const bakeArtifacts = document.getElementById("bakeArtifactsInput").checked;
+    const editorLayer = document.getElementById("layerInput").value;
+    const imageWidth = document.getElementById("loadWidthInput").value;
     if(newLevel) level = "NA";
     const isNull = checkIfNull([
         ["path to image",image],
@@ -84,7 +91,9 @@ const compileJSON = () => {
         ["threshold", threshold],
         ["incorperate threshold", incorperateThreshold],
         ["overlap quality", overlapQuality],
-        ["pass threshold",passThreshold]
+        ["pass threshold",passThreshold],
+        ["editor layer",editorLayer],
+        ["image width",imageWidth]
     ]);
     if(isNull) {
         document.getElementById("errorOut").style.display="block";
@@ -114,6 +123,8 @@ const compileJSON = () => {
         protectWhites:protectWhites, // prevent artifacts in white colors (rgb>config.whiteThreshold) useful when removeing white
         whiteIsTransparency: whiteIsTransparency,
         cleanUpNonMerged:true, // true = replace single pixels with neighbors, false = create new group for every single pixel
+        editorLayer:editorLayer,
+        imageWidth:imageWidth
     }
 }
 

@@ -18,18 +18,6 @@
             The file path to the image you want to load to Geometry Dash, relative to the location this program is stored.
         `">?</div>
         <br>
-        <div class="property">Create new level: </div><input type="checkbox" class="input-checkbox" id="newLevelInput">
-        <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
-            Load image into a new Geometry Dash level.
-        `">?</div>
-        <br>
-        <div id="gdLevelContainer">
-            <div class="property">Geometry Dash level: </div> <div class="inputContainer"><input type="text" id="levelInput" class="input" placeholder="name"></div>
-            <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
-                The name of the level you want to load the image into.
-            `">?</div>
-        </div>
-        <br>
         <div class="property">Save location: </div> <div class="inputContainer">./saves/<input type="text" class="input" id="saveLocationInput" placeholder="save name"></div>
         <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
             The location to save important data about the image build such as the build file and build stats.
@@ -48,6 +36,7 @@
         `">?</div>
         <br>
         <div class="property">Image scan resolution: </div> <div class="inputContainer"><input type="number" id="scanWidthInput" class="input" placeholder="width"></div><div style="font-family:'Space Mono', monospace;font-size:0.75cm;display:inline-block">x</div><div class="inputContainer"><input type="number" id="scanHeightInput" class="input" placeholder="height"></div>
+        <br>
         <div class="description">
             The resolution the image will be processed at. <br>
             KEEP LOW!  200x112 recomended for horizontal images and 140x180 for vertical images<br><br>
@@ -103,6 +92,33 @@
             leading to fewer groups, but a lower quality. <br>
             Do not use this with a white background, it will lead to major artifacting.
         `">?</div>
+        <br>
+        <div class="property" style="font-weight:bold;">Import settings: </div><br>
+        <div class="property">Create new level: </div><input type="checkbox" class="input-checkbox" id="newLevelInput">
+        <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+            Load image into a new Geometry Dash level.
+        `">?</div>
+        <br>
+        <div id="gdLevelContainer">
+            <div class="property">Geometry Dash level: </div> <div class="inputContainer"><input type="text" id="levelInput" class="input" placeholder="name"></div>
+            <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+                The name of the level you want to load the image into.
+            `">?</div>
+
+        </div>            
+        <br>
+        <div class="property">Editor layer: </div> <div class="inputContainer"><input type="number" id="layerInput" class="input" placeholder="layer" value="0"></div>
+        <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+            The Geometry Dash editor layer to load the image to.
+        `">?</div>
+        <br>
+        <div class="property">Image width: </div> <div class="inputContainer"><input type="number" id="loadWidthInput" class="input" placeholder="layer" value="150"></div>
+        <br>
+        <div class="description">
+            The width in <div style="background-color:rgba(80,50,100,0.35); display: inline-block;font-weight: bold;">Pixels</div> the image will be loaded into the level at.<br>
+            The aspect ratio, and therefore the height, is determined by the "Image scan resolution".<br>
+            You can't resize the image in the GD editor after loading it.
+        </div>
         <div class="error-text" id="errorOut"style="display:none;"></div>
         <div id="startButton">Start</div>
 

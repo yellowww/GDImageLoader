@@ -56,6 +56,42 @@ const grouping = {
         }
         grouping.objLinkers = container;
     },
+    mapLinkers:() => {
+        let objDeep = JSON.parse(JSON.stringify(grouping.objs));
+        let context = [];
+        let sortedIndexes = [];
+        for(let i=0;i<objDeep.length;i++) context.push(i);
+        for(let i=0;i<grouping.bounded.length;i+=1) {
+            const minI = grouping.getMin(objDeep.map(e=>e.pixels.length));
+            const trueIndex = context[minI];
+            sortedIndexes.push(trueIndex);
+            objDeep.splice(minI,1);
+            context.splice(minI,1);
+        }
+        let _bounded = JSON.parse(JSON.stringify(grouping.bounded));
+        let _objLinkers = JSON.parse(JSON.stringify(grouping.objLinkers));
+        let _objs = JSON.parse(JSON.stringify(grouping.objs));
+        for(let i=0;i<sortedIndexes.length;i++) {
+            const swapI = sortedIndexes.indexOf(i);
+            _bounded[i] = grouping.bounded[swapI];
+            _objs[i] = grouping.objs[swapI];
+            for(let j=0;j<grouping.objLinkers.length;j++) {
+                for(let k=0;k<grouping.objLinkers[j].length;k++) {
+                    if(grouping.objLinkers[j][k] == swapI) _objLinkers[j][k] = i;
+                }
+            }
+        }
+        grouping.bounded = _bounded;
+        grouping.objs = _objs;
+        grouping.objLinkers = _objLinkers;
+    },
+    getMin:(array) => {
+        let min = Infinity,minI;
+        for(let i=0;i<array.length;i++) {
+            if(array[i]<min){min = array[i];minI=i};
+        }
+        return minI;
+    },
     scalePrimitives:(amount) => {
         for(let i=0;i<grouping.finsishedPrimitives.length;i++) {
             for(let j=0;j<grouping.finsishedPrimitives[i].length;j++) {
@@ -126,12 +162,14 @@ const thread = {
     currentGroupIndex:0,
     vectorizeTime:undefined,
     loadAndInit:(localConfig) => {
+        process.name = "GD Image Loader";
         config = localConfig;
         canvas = createCanvas(config.res[0],config.res[1]);
         ctx = canvas.getContext('2d');   
         thread.start();
     },
     start:() => {
+        console.log("\n\n");
         if(fs.existsSync(config.saveLocation)) {
             console.log(`\x1b[33m\x1b[1m[WARNING]\x1b[0m\x1b[33m filepath \x1b[34m${config.saveLocation}\x1b[33m already exists`);
             console.log("Program will proceed to overwrite save files in this location.\x1b[0m\n");
@@ -141,7 +179,7 @@ const thread = {
         }            
         thread.mainThread();
     },
-    doSolutionIteration:(i) => {
+    doSolutionIteration:(i,cb) => {
         thread.currentGroupIndex = i;
         if(i>=grouping.bounded.length) {
             thread.vectorizeTime = new Date().getTime()-thread.solveStartTime;
@@ -158,16 +196,18 @@ const thread = {
                     rendering.saveData(config.saveLocation+"/Comp.png");
                     rendering.savePrimitiveSet(grouping.finsishedPrimitives, config.saveLocation+"/PrimSet.png");
                     rendering.saveStandardRender(grouping.countPrims(),config.saveLocation+"/Standard.png");
+                    
                 }
                 rendering.saveStatsFile(config.saveLocation+"/Stats.json")    
-                rendering.saveGDIFile(config.saveLocation+"/ConstructFile.gdi");   
+                rendering.saveGDIFile(config.saveLocation+"/ConstructFile.gdi");
+                cb()   
                 return;                
             },200);
 
         } else {                
             solutions.solveWholeGroup(grouping.bounded[i], (primitives) => {
-                grouping.finsishedPrimitives.push(primitives);
-                setTimeout(()=>thread.doSolutionIteration(i+1),3); 
+                if(primitives.solutions.length>0)grouping.finsishedPrimitives.push(primitives); 
+                setTimeout(()=>thread.doSolutionIteration(i+1,cb),3); 
             });
         }
     },
@@ -201,10 +241,16 @@ const thread = {
                         compress.convertToGroupObjs(() => {
                             compress.incorperateSmallerGroups();
                             compress.convertToBoundedGroups();
+                            grouping.mapLinkers();
                             grouping.finsishedPrimitives = [];
-                            process.stdout.write("\n\n\n\n");
+                            process.stdout.write("\n\n\n\n\n");
                             thread.solveStartTime = new Date().getTime();
-                            thread.doSolutionIteration(0);   
+                            thread.doSolutionIteration(0, () => {
+                                setTimeout(()=> {
+                                    process.stdout.write("\n");
+                                    builder.loadConstruct(config.saveLocation, config.newLevel,config.gdLevel,config.imageWidth,config.editorLayer);
+                                },1000);
+                            });   
                         });             
                     });
                 });        
@@ -635,13 +681,15 @@ let terminal = {
         process.stdout.write("\r\x1b[K");
         process.stdout.write("\033[F\r\x1b[K");
         process.stdout.write("\033[F\r\x1b[K");
+        process.stdout.write("\033[F\r\x1b[K");
+        terminal.numOfLines = numOfLines;
         for(let i=0;i<numOfLines;i++) process.stdout.write("\033[F\r\x1b[K");
         process.stdout.write(
             progressString+"\n"+
             terminal.createProgressBar(thread.currentGroupIndex/grouping.bounded.length,50)+" "+percent+
             "% of "+grouping.bounded.length+" groups solved\n"+
             terminal.createProgressBar(thread.currentPixelsScanned/(config.res[0]*config.res[1]),50)+" "+pixelPercent+
-            "% of "+(config.res[0]*config.res[1])+" pixels solved\n"
+            "% of "+(config.res[0]*config.res[1])+" pixels solved\n\n"
             );
     },
     logVectorFinish:() => {
@@ -649,6 +697,7 @@ let terminal = {
         process.stdout.write("\033[F\r\x1b[K");
         process.stdout.write("\033[F\r\x1b[K");
         process.stdout.write("\033[F\r\x1b[K");
+        for(let i=0;i<terminal.numOfLines;i++) process.stdout.write("\033[F\r\x1b[K");        
         process.stdout.write("\x1b[1m\x1b[4mVectorizing Image...\x1b[0m - Done!\n");
     }
 }
@@ -716,7 +765,7 @@ let solutions = {
             solutions.currentGroupSolutions.push(solution.res);
             thread.currentPixelsScanned+=inclusions-solutions.getInclusions(groupCopy);
             thread.currentObjects++;
-            if(lastTime>1000) {
+            if((new Date().getTime())-lastTime>1000) {
                 terminal.logVectorStats();
             }
             lastTime = new Date().getTime();
@@ -735,13 +784,20 @@ let solutions = {
         cb({solutions:solutions.currentGroupSolutions,totalOverlap:totalOverlap.length});
 
     },
-    tryAllAssets:(group,pass,scoreMin,quality,lastScore,lastOverflow,callStack) => {
-        if(callStack == undefined) callStack=0;
+    tryAllAssets:(group,pass,scoreMin,quality,lastScore,lastOverflow,callStack,startDate) => {
+        if(callStack == undefined) {
+            callStack=0;
+        }
         if(pass == undefined) pass=0;
         if(scoreMin == undefined) scoreMin = config.passThreshold;
         if(quality == undefined) quality = config.overlapQuality;
         if(lastScore == undefined) lastScore = -Infinity;
         if(lastOverflow == undefined) lastOverflow = Infinity;
+        if(startDate == undefined) startDate = new Date().getTime();
+        if(new Date().getTime()-startDate>2000 && callStack%250 == 0) {
+            process.stdout.write("\033[F\r\x1b[K");
+            process.stdout.write("Working on asset for "+(Math.round((new Date().getTime()-startDate)/10)/100)+" secconds.\n");
+        }
         const totalPixels = solutions.getInclusions(group);
         const totalArea = group.binary.length*group.binary[0].length;
         const totalEmptySpace = totalArea-totalPixels;
@@ -766,13 +822,15 @@ let solutions = {
             if(finalScore>bestResultScore) {bestResult = {res:result,overflow:solutions.getAllOverlap(group,result)};scores={score:score.score,overlap:score.overlap};bestResultScore=finalScore};
             
         }
+
         if(callStack>=config.maxCallback) return bestResult;
-        if(bestResult == undefined) return solutions.tryAllAssets(group,pass+5,scoreMin,quality,lastScore,scores.overlap,callStack+1);
+        if(bestResult == undefined) return solutions.tryAllAssets(group,pass+5,scoreMin,quality,lastScore,scores.overlap,callStack+1,startDate);
         if(bestResultScore>lastScore*2 && config.lowObjectCount) {
-            const nestedRes = solutions.tryAllAssets(group,pass+5,scoreMin,quality*0.75,bestResultScore,scores.overlap,callStack+1)
+            const nestedRes = solutions.tryAllAssets(group,pass+5,scoreMin,quality*0.75,bestResultScore,scores.overlap,callStack+1,startDate)
             if(nestedRes.overflow<scores.overlap*1.25)return nestedRes;
         }
-        if(scores.overlap/totalEmptySpace>1-scoreMin && config.lowObjectCount) return solutions.tryAllAssets(group,pass+5,scoreMin/1.2,quality,lastScore,scores.overlap,callStack+1);
+        if(scores.overlap/totalEmptySpace>1-scoreMin && config.lowObjectCount) return solutions.tryAllAssets(group,pass+5,scoreMin/1.2,quality,lastScore,scores.overlap,callStack+1,startDate);
+
         return bestResult;
     },
     solveGroup:(group) => {
