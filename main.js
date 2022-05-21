@@ -133,10 +133,15 @@ const grouping = {
             let thisRelColumn = [];
             for(let j=0;j<grouping.finsishedPrimitives[i].length;j++) {
                 const thisPrim = grouping.finsishedPrimitives[i][j];
+                const pxScale = thisPrim.size*(config.assetRes/config.res[0]);
+                let ceilScale = Math.ceil(pxScale*config.res[0])/config.res[0];
+                if(ceilScale*config.res[0] == 1) {
+                    thisPrim.name = "square.png";
+                }
                 const newPrim = {
                     x:thisPrim.x/config.res[0],
                     y:thisPrim.y/config.res[0],
-                    size:thisPrim.size*(config.assetRes/config.res[0]),
+                    size:ceilScale,
                     color:thisPrim.color,
                     name:thisPrim.name
                 }
@@ -248,7 +253,7 @@ const thread = {
                             thread.doSolutionIteration(0, () => {
                                 setTimeout(()=> {
                                     process.stdout.write("\n");
-                                    builder.loadConstruct(config.saveLocation, config.newLevel,config.gdLevel,config.imageWidth,config.editorLayer);
+                                    builder.loadConstruct(config.saveLocation, config.newLevel,config.gdLevel,config.imageWidth,config.editorLayer,config.specifiedDensity);
                                 },1000);
                             });   
                         });             
@@ -644,8 +649,9 @@ let rendering = {
 
 
 let terminal = {
-    createProgressBar:(progress,width) => {
-        let string = "\x1b[1m[\x1b[36m\x1b[46m";
+    createProgressBar:(progress,width,color) => {
+        if(color == undefined) color = "\x1b[46m"
+        let string = "\x1b[1m[\x1b[36m"+color;
         for(let i=0;i<width;i++) {
             if(i<progress*width) {
             } else {
@@ -745,6 +751,7 @@ let solutions = {
     allSolutions:[],
     currentIteration:0,
     divFactor:0.5,
+    callStack:undefined,
     thisSolution:undefined,
     currentGroupSolutions:[],
     solveWholeGroup: (group,cb) => {
@@ -758,6 +765,7 @@ let solutions = {
             solutions.thisSolution = {x:0,y:0,size:0.05,asset:assets.assetData[5].data};
             solutions.currentIteration = 0;
             solutions.divFactor = 0.5;
+            solutions.callStack = 0;
             const solution = solutions.tryAllAssets(groupCopy);
             solution.res.color = group.color;
             solutions.cutFromGroup(groupCopy,solution.res);
@@ -784,19 +792,16 @@ let solutions = {
         cb({solutions:solutions.currentGroupSolutions,totalOverlap:totalOverlap.length});
 
     },
-    tryAllAssets:(group,pass,scoreMin,quality,lastScore,lastOverflow,callStack,startDate) => {
-        if(callStack == undefined) {
-            callStack=0;
-        }
+    tryAllAssets:(group,pass,scoreMin,quality,lastScore,lastOverflow,startDate) => {
         if(pass == undefined) pass=0;
         if(scoreMin == undefined) scoreMin = config.passThreshold;
         if(quality == undefined) quality = config.overlapQuality;
         if(lastScore == undefined) lastScore = -Infinity;
         if(lastOverflow == undefined) lastOverflow = Infinity;
         if(startDate == undefined) startDate = new Date().getTime();
-        if(new Date().getTime()-startDate>2000 && callStack%250 == 0) {
+        if(new Date().getTime()-startDate>100 && solutions.callStack%50 == 0) {
             process.stdout.write("\033[F\r\x1b[K");
-            process.stdout.write("Working on asset for "+(Math.round((new Date().getTime()-startDate)/10)/100)+" secconds.\n");
+            process.stdout.write(`          ${terminal.createProgressBar(solutions.callStack/config.maxCallback,30, "\x1b[41m")} ${Math.round(solutions.callStack/config.maxCallback*1000)/10}% (Quality optimization)\n`);
         }
         const totalPixels = solutions.getInclusions(group);
         const totalArea = group.binary.length*group.binary[0].length;
@@ -822,14 +827,14 @@ let solutions = {
             if(finalScore>bestResultScore) {bestResult = {res:result,overflow:solutions.getAllOverlap(group,result)};scores={score:score.score,overlap:score.overlap};bestResultScore=finalScore};
             
         }
-
-        if(callStack>=config.maxCallback) return bestResult;
-        if(bestResult == undefined) return solutions.tryAllAssets(group,pass+5,scoreMin,quality,lastScore,scores.overlap,callStack+1,startDate);
+        solutions.callStack++;
+        if(solutions.callStack>=config.maxCallback) return bestResult;
+        if(bestResult == undefined) return solutions.tryAllAssets(group,pass+5,scoreMin,quality,lastScore,scores.overlap,startDate);
         if(bestResultScore>lastScore*2 && config.lowObjectCount) {
-            const nestedRes = solutions.tryAllAssets(group,pass+5,scoreMin,quality*0.75,bestResultScore,scores.overlap,callStack+1,startDate)
+            const nestedRes = solutions.tryAllAssets(group,pass+5,scoreMin,quality*0.75,bestResultScore,scores.overlap,startDate)
             if(nestedRes.overflow<scores.overlap*1.25)return nestedRes;
         }
-        if(scores.overlap/totalEmptySpace>1-scoreMin && config.lowObjectCount) return solutions.tryAllAssets(group,pass+5,scoreMin/1.2,quality,lastScore,scores.overlap,callStack+1,startDate);
+        if(scores.overlap/totalEmptySpace>1-scoreMin && config.lowObjectCount) return solutions.tryAllAssets(group,pass+5,scoreMin/1.2,quality,lastScore,scores.overlap,startDate);
 
         return bestResult;
     },

@@ -64,13 +64,35 @@ body {
     padding-right:7.5vw;
     padding-bottom: 2cm;
     color:rgb(80, 63, 1);
+}
+
+.new-config-button {
+    font-family: 'Fira Code', monospace; 
+    font-size:0.9cm;
+    display:inline-block;
+    background-color: burlywood;
+    padding:0.5cm;
+    border-top-left-radius: 0.3cm;
+    border-top-right-radius: 0.3cm;
+    padding-top:0.2cm;
+    cursor:pointer;
+    padding-bottom:0.1cm;
+    user-select: none;
+}
+
+
+.seperation-bar {
+    width:80vw;
     margin-bottom:2cm;
+    padding-left:7.5vw;
+    padding-right:7.5vw;
+    margin-left:2.5vw;
     border-bottom: 2px solid rgb(80, 63, 1);
 }
 
 .property {
     font-size: 0.75cm;
-    margin-left:2cm;
+    margin-left:3cm;
     color:rgb(30, 30, 30);
     font-family: 'Space Mono', monospace;
     display:inline-block;
@@ -135,7 +157,7 @@ body {
     border-radius: 0.5cm;
     padding:0.5cm;
     border-top-left-radius: 0;
-    margin-left:2.5cm;
+    margin-left:3.5cm;
 }
 
 #startButton {

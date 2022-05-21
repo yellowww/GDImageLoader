@@ -39,7 +39,7 @@ let build = {
             cb();
         });
     },
-    loadIntoLevel:(save,newLevel,levelName, width,layer) => {
+    loadIntoLevel:(save,newLevel,levelName, width,layer,densityOverride) => {
         process.stdout.write(`\x1b[37m\x1b[1mLoading ${save}/ConstructFile.gdi...\x1b[0m`);
 
         build.loadBuildFile(`${save}/ConstructFile.gdi`, () => {
@@ -58,10 +58,13 @@ let build = {
                     build.getMaxHeight(width,(maxHeight,totalObjects) => {
                         const objectDensity = totalObjects/(width*maxHeight);
                         let targetDensity = false;
-                        if(objectDensity>0.8)    {
-                            targetDensity = 0.078;
-                            process.stdout.write("\x1b[33m\x1b[1m[WARNING] \x1b[0m\x1b[33m- Object density too high, decreasing render resolution...\nTo get a better result, decrease the quality the image is processed at in the configurator.\x1b[0m\n\n");
+                        const densityMax = densityOverride?densityOverride:0.066-Math.sqrt(width/40)/100;
+                        const densityMax1 = densityOverride?densityOverride-0.005:0.063-Math.sqrt(width/40)/100;
+                        if(objectDensity>densityMax)    {
+                            targetDensity = densityMax1;
+                            process.stdout.write("\x1b[33m\x1b[1m[WARNING] \x1b[0m\x1b[33m- Object density too high, decreasing render resolution...\nTo get a better result, decrease the quality the image is processed at in the configurator, or increase the Image width.\x1b[0m\n\n");
                         }
+                        
                         if(targetDensity) {
                             let remainingObjects = totalObjects;
                             for(let i=build.data.length-1;i>=0;i-=2) {
@@ -72,6 +75,7 @@ let build = {
                         }
                         let adjustedTotalObjects = 0;
                         for(let i=0;i<build.data.length;i++) {
+                            //if(i==3334) console.log(build.data[i]);
                             for(let j=0;j<build.data[i].length;j++) {
                                 adjustedTotalObjects++;
                                 build.addBuildObject(build.data[i][j],width,maxHeight,i,layer);
@@ -98,7 +102,7 @@ let build = {
     addBuildObject:(thisObject, width,maxHeight,z,eLayer) => {
 
         const pxToGD = 30;        
-        let scale = (thisObject.size*width/pxToGD)*1.7;
+        let scale = (thisObject.size*width/pxToGD)*1.5;
         thisObject.x+=thisObject.size/2;
         thisObject.y+=thisObject.size/2;
         const centerX = (thisObject.x)*width, centerY = (thisObject.y)*width;
@@ -170,6 +174,9 @@ let build = {
             decoded = build.cutAtChar(decoded, "kA11,0;");
             build.addColorChannel();
             build.parsedObjs = decoded.split(';');
+            //build.parsedObjs.pop();
+            //const index = build.parsedObjs.map(e=>Number(e.split("25,")[1].split(",")[0])).indexOf(3334);
+            //console.log(build.parsedObjs[index]);
             build.parsedObjs = [];
         }
 
@@ -247,6 +254,7 @@ let build = {
         if(type=="tri") {id=693};
         scale = Math.round(scale*1000)/1000;
         build.parsedObjs.pop();
+        //if(z==3334)console.log(x,y,(scale/2.3)/1000*30);
         build.parsedObjs.push(`1,${id},2,${x},3,${y},5,1,6,${rot},32,${scale},41,1,43,${hsv},25,${z},5,true,21,${build.colorChannel},20,${layer}`);
         build.parsedObjs.push('');
     },
@@ -304,5 +312,5 @@ let build = {
 
 exports.loadConstruct = build.loadIntoLevel;
 setTimeout(()=> {
-    //build.loadIntoLevel("./saves/cat",true,"Image To GD",150,1);
+    //build.loadIntoLevel("./saves/edwin1",false,"Image To GD",1000,1);
 },50)
