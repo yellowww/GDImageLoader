@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>GD Image Loader - Help</title>
+        <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@300;400&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+        <link href="style.css" rel="stylesheet">
+        <script src="script.js" defer></script>
+    </head>
+    <body>
+        <div class="title">GD IMAGE LOADER - HELP</div>
+        <div class="sidebar">
+            <div class="sidebar-item" onclick="setFocus('settingsContent')">Settings</div>
+            <div class="sidebar-item" onclick="setFocus('errorContent')">Errors</div>
+            <div class="sidebar-item" onclick="setFocus('procedureContent')">Procedure</div>
+        </div>
+        <div class="main-content" id="mainContent">
+            <div id="settingsContent">
+                <div class="content-title">Settings</div>
+
+                <div class="content-heading">Path to image</div>
+                <div class="content-text">The relative path from the root program directory to the image you want to load into a Geometry Dash level. <br>
+                    Example: <div class="content-code">./image.png</div>, <div class="content-code">./sourceImages/cat.jpg</div>.
+                </div>
+
+                <div class="content-heading">Save location</div>
+                <div class="content-text">The relative path from the root program directory to a folder to save important information about the processed image. <br>
+                    Example: <div class="content-code">./saves/firstImport</div>, <div class="content-code">./saves/cat</div>.
+                </div>
+
+                <div class="content-heading">Save Image benchmarks</div>
+                <div class="content-text">By default, the program will save files to the save location, some of these are not necesary for the functinoality of the program. These include images that are usefull when loading from a save, or restoring a backup. They can also be useful when diagnosing an issue if you encounter one.<br>If you do not wan't to save these images, you can disable this setting.</div>.
+                
+                <div class="content-heading">Quality optimization</div>
+                <div class="content-text">
+                    When converting the pixels of an image into Geometry Dash objects, often times it will create artifacts. By enabling this setting, it will decrease these artifacts. This could lead to anywhere from a slight to great increase in the number of objects used.<br>
+                    It acomplishes this by running the algoritm many times, adjusting important values that will affect the result. Such as,
+                    <div class="content-code">Overlap quality</div> and <div class="content-code">Pass threshold</div>.<br>
+                    This means that it will take longer to process your image.
+                </div>
+
+                <div class="content-heading">Image scan resolution</div>
+                <div class="content-text">
+                    This is the resolution the image will be processed at. It is not the final resolution of the result. <br>
+                    The final result does not have a "resolution" as it is made up of geometric objects, not pixels. <br>
+                    This setting does control the aspect ratio of the result. For example a resolution of <div class="content-code">180x100</div> will have an aspect ratio of about <div class="content-code">16/9</div>.<br>
+                    It is strongly recomended to keep this setting low, as high resolutions can lead to long procsess times and high object counts.
+                </div>
+
+                <div class="content-heading">Compression threshold</div>
+                <div class="content-text">
+                    The first step of this program is to group similar colors together.<br>
+                    This setting controls how many different colors will be in the final image.<br>
+                    If your result's colors do not look correct, turn this setting down. This will lead to better colors, but a higher object count and a longer process time.
+                </div>
+
+                <div class="content-heading">Incorperate threshold</div>
+                <div class="content-text">
+                    When compressing pixels into color groups, some color groups may only have a few pixels. This is extremely inefficient.<br>
+                    The program will combine any color groups with less pixels than the incorperate threshold into a nearby color group. <br>
+                    This will lead to far fewer objects.<br>
+                    Keep in mind that the effectiveness of a certian Incorperate threshold is directly tied to the process resolution.
+                </div>
+
+                <div class="content-heading">Enhance Details</div>
+                <div class="content-text">
+                    When grouping similar colors together, some pixels will be left, not belonging to any color group.<br>
+                    Noramly, they will just be added to a nearby group.<br>
+                    Enchance details will create a new color group for every stray pixel.<br>
+                    This setting is recomended for high quality imports. When not enabled, It can lead to horizontal artifacting on high quality imports.
+                </div>
+
+                <div class="content-heading">White is transparency</div>
+                <div class="content-text">
+                    This program does not support transparency, as it uses the <div class="content-code">RGB</div> color space. It will treat any transparency as black.<br>
+                    This setting will treat all white colors (greater than 245 on every channel) as fully transparent, and remove them after processing. <br>
+                    NOTE: any artifacts in white colors will presist after they are removed. This can lead to non-white parts of the image to be missing.
+                </div>
+
+                <div class="content-heading">Protect whites</div>
+                <div class="content-text">
+                    Sometimes, when <div class="content-code">White is transparency</div> is enabled, it will miss a spot, because of an artifact during color compression.<br>
+                    When this setting is enabled, it will greatly decrease the number of artifacts present.<br>
+                    This is STRONGLY recomended when <div class="content-code">White is transparency</div> is enabled.
+                </div>
+
+                <div class="content-heading">Overlap quality</div>
+                <div class="content-text">
+                    When an image is being processed, there are some settings that will influence what the outcome will be.<br>
+                    This setting controls the starting scale of a possible solution.<br>
+                    Generaly, the higher this setting is, the greater the detail and object count.<br>
+                    Unless you know what you are doing, it is not recomended to change this setting.
+                </div>
+
+                <div class="content-heading">Pass threshold</div>
+                <div class="content-text">
+                    If a possible solution has too many artifacts, it will be thrown out. <br>
+                    This setting determines the threshold at which these solutions will be thrown out.<br>
+                    This setting is only relevant if <div class="content-code">Quality optimization</div> is enabled.<br>
+                    Unless you know what you are doing, it is not recomended to change this setting.
+                </div>
+
+                <div class="content-heading">Bake artifacts</div>
+                <div class="content-text">
+                    When processing an image, some solutions may overlap onto other color groups. <br>
+                    Normaly nothing will be done about this, and the artifact will usualy be covered up. <br>
+                    When this setting is enabled, it will cut pixels from other color groups that were overlaped onto.<br>
+                    When it is enabled, it will lead to lower object cound and usualy a less detailed result with many artifats.<br>
+                    Occasionaly, in the right circumstances, this setting could improve the quality of the result.
+                </div>
+
+                <div class="content-heading">Create new level</div>
+                <div class="content-text">
+                    Whether to load the image into a new Geometry Dash level that the program will create.<br>
+                    The level will be called <div class="content-code">Image To GD</div>.
+                </div>
+
+                <div class="content-heading">Geometry Dash level</div>
+                <div class="content-text">
+                    If you are loading the image into a level that you already have, specify the name of that level.
+                </div>
+
+                <div class="content-heading">Editor layer</div>
+                <div class="content-text">
+                    The layer that the image will be loaded onto in the Geometry Dash editor.
+                </div>
+
+                <div class="content-heading">Override auto density ballencing</div>
+                <div class="content-text">
+                    Geometry Dash has some weird glitches, one of these being that if you have too many objects close together in a level, it will not open.<br>
+                    To solve this, the program will try to calculate the maximum number of objects it will be able to load without crashing the level.<br>
+                    If you get a message in the command prompt saying this has happened,
+                    it is recomended to remove the image you loaded and try again at a lower quality. You can also increase the image width until all the objects can be successfully loaded.<br>
+                    Sometimes it will get this wrong and the level will not open.<br>
+                    To fix this, restore a backup and enable this setting, so you can lower the <div class="content-code">Specified maximum density</div>.
+                </div>
+                <div class="content-heading">Specified maximum density</div>
+                <div class="content-text">
+                    If you enable <div class="content-code">Override auto density ballencing</div>, then you can change this setting. <br>
+                    This setting controls the maximum amount of objects that can be loaded based on the <div class="content-code">Image width</div>. <br>
+                    Decrease this setting to remove more objects, and reduce density.<br>
+                    Increase this setting to allow for more detail, if you are being limited by object density.<br>
+                    WARNING: Increasing this setting can lead to your level not opening, and you having to restore a backup made before the change.
+                </div>
+                <div class="content-heading">Save location - (Load from Save)</div>
+                <div class="content-text">
+                    The save name from a previous image that you loaded that you want to re-add, to another level.<br>
+                    It can take time to process some images so if you want, you can load an image that you already processed directly into another level. <br>
+                    Just specify the save name for the image you want to re-add.<br>
+                    It will show you a preview of the image if <div class="content-code">Save Image benchmarks</div> was enabled for that save.
+                </div>
+            </div>
+            <div id="errorContent">
+                <div class="content-title">Errors, Warnings and Problems</div>
+                <div class="content-important">This program was built for windows, it will not work on mac or linux.</div>
+
+                <div class="content-heading">File read/write errors</div>
+                <div class="content-text">
+                    If you recieve any errors that mention not being able to read, write, or find files, you should check the permissions of the 
+                    <div class="content-code">GDImageLoader.sh</div> file.<br> Make sure it has acsess to the disk that Geometry Dash is located on.<br> 
+                    If it still doesn't work, try removeing and reinstalling the program to a different location.<br>
+                    If the issue still persists, submit an issue on the github page.
+                </div>
+
+                <div class="content-heading">Error! Could not open or find GD save file</div>
+                <div class="content-text">
+                    This likley means Geometry Dash is not installed in the proper place, <br>
+                    or the <div class="content-code">GDImageLoader.sh</div> file does not have proper permissions.<br>
+                    Follow instructions for <div class="content-code">File read/write errors</div>.
+                </div>
+                
+                <div class="content-heading">Save directory warning</div>
+                <div class="content-text">
+                    If you get a warning that says <div class="content-code">filepath ____ already exists</div>, it means that you already have a save folder by that name. <br>
+                    The program will over-write all the data of the previous save at that location.
+                </div>
+
+                <div class="content-heading">Object density warning</div>
+                <div class="content-text">
+                    This warning means that the program had to remove objects from the result image to prevent the level from crashing.<br>
+                    For a better looking image, decrease the quality or increase the <div class="content-code">Image width</div>.<br><br>
+                    If your level does not open follow instructions for <div class="content-code">I can't open my level</div>.
+                </div>
+
+                <div class="content-heading">All my levels disappeared</div>
+                <div class="content-text">
+                    This is almost certianly a big in the program.<br>
+                    Restore a backup by running the <div class="content-code">Recovery.sh</div> file.<br>
+                    Submit an issue on the github page.
+                </div>
+
+                <div class="content-heading">I can't open my level</div>
+                <div class="content-text">
+                    First restore a backup by running the <div class="content-code">Recovery.sh</div> file.<br>
+                    Then when you try to load the image again, in the configuration, enable <div class="content-code">Override auto density ballencing</div>, then decrease <div class="content-code">Specified maximum density</div>.<br>
+                    If it still does not open, repeat this step and decrease <div class="content-code">Specified maximum density</div> even more.
+                </div>
+
+                <div class="content-heading">Other errors</div>
+                <div class="content-text">
+                    If you expireienced an error not mentioned here, submit an issue on the github page.<br>
+                </div>
+            </div>
+            <div id="procedureContent">
+                <div class="content-title">Procedure</div>
+            </div>
+        </div> 
+
+    </body>
+</html>

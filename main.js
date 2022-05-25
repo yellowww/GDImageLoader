@@ -3,6 +3,7 @@ const { createCanvas } = require("canvas");
 const fs = require("fs");
 const router = require("./router.js");
 const builder = require("./build.js");
+const path = require('path');
 let ctx,canvas;
 
 
@@ -175,8 +176,8 @@ const thread = {
     },
     start:() => {
         console.log("\n\n");
-        if(fs.existsSync(config.saveLocation)) {
-            console.log(`\x1b[33m\x1b[1m[WARNING]\x1b[0m\x1b[33m filepath \x1b[34m${config.saveLocation}\x1b[33m already exists`);
+        if(fs.existsSync(path.join(__dirname,config.saveLocation))) {
+            console.log(`\x1b[33m\x1b[1m[WARNING]\x1b[0m\x1b[33m filepath \x1b[34m\x1b[47m${config.saveLocation}\x1b[0m\x1b[33m already exists`);
             console.log("Program will proceed to overwrite save files in this location.\x1b[0m\n");
         } else {
             process.stdout.write("\x1b[1mBuilt save directory\x1b[0m\n\n");
@@ -198,13 +199,12 @@ const thread = {
                 const relativePrims = grouping.createRelativePrims();
                 grouping.relativePrimatives = relativePrims;
                 if(config.generateImageSave) {
-                    rendering.saveData(config.saveLocation+"/Comp.png");
-                    rendering.savePrimitiveSet(grouping.finsishedPrimitives, config.saveLocation+"/PrimSet.png");
-                    rendering.saveStandardRender(grouping.countPrims(),config.saveLocation+"/Standard.png");
-                    
+                    rendering.saveData(path.join(__dirname,config.saveLocation,"/Comp.png"));
+                    rendering.savePrimitiveSet(grouping.finsishedPrimitives, path.join(__dirname,config.saveLocation,"PrimSet.png"));
+                    rendering.saveStandardRender(grouping.countPrims(),path.join(__dirname,config.saveLocation,"Standard.png"));
                 }
-                rendering.saveStatsFile(config.saveLocation+"/Stats.json")    
-                rendering.saveGDIFile(config.saveLocation+"/ConstructFile.gdi");
+                rendering.saveStatsFile(path.join(__dirname,config.saveLocation,"Stats.json"));    
+                rendering.saveGDIFile(path.join(__dirname,config.saveLocation,"/ConstructFile.gdi"));
                 cb()   
                 return;                
             },200);
@@ -218,7 +218,8 @@ const thread = {
     },
     mainThread:() => {
         process.stdout.write("\x1b[1mLoading image...\x1b[0m\n");
-        Jimp.read(config.imagePath, function (err, image) {
+
+        Jimp.read(path.join(__dirname,config.imagePath), function (err, image) {
             if(err) {process.stdout.write("[IMAGE_LOAD_ERROR] "+err+"\n");return;}
             process.stdout.write("\033[F\r\x1b[K");
             process.stdout.write("\x1b[1mLoading image\x1b[0m - Done!\n");   
@@ -253,7 +254,9 @@ const thread = {
                             thread.doSolutionIteration(0, () => {
                                 setTimeout(()=> {
                                     process.stdout.write("\n");
-                                    builder.loadConstruct(config.saveLocation, config.newLevel,config.gdLevel,config.imageWidth,config.editorLayer,config.specifiedDensity);
+                                    builder.loadConstruct(config.saveLocation, config.newLevel,config.gdLevel,config.imageWidth,config.editorLayer,config.specifiedDensity,()=> {
+                                        setTimeout(()=>terminal.closeMessage(0),100);
+                                    });
                                 },1000);
                             });   
                         });             
@@ -705,6 +708,18 @@ let terminal = {
         process.stdout.write("\033[F\r\x1b[K");
         for(let i=0;i<terminal.numOfLines;i++) process.stdout.write("\033[F\r\x1b[K");        
         process.stdout.write("\x1b[1m\x1b[4mVectorizing Image...\x1b[0m - Done!\n");
+    },
+    closeMessage:(code) => {
+        process.stdout.write("\nPress any key to close program...\n");
+        const readline = require('readline');
+
+        readline.emitKeypressEvents(process.stdin);
+        process.stdin.setRawMode(true);
+        
+        process.stdin.on('keypress', (str, key) => {
+            process.exitCode = code;
+            process.exit();
+        })
     }
 }
 
@@ -724,7 +739,7 @@ let assets = {
         });
     },
     loadSingleAsset:(asset,cb) => {
-        Jimp.read('./assets/'+asset,(err,image) => {
+        Jimp.read(path.join(__dirname,'assets',asset),(err,image) => {
             if(err) {process.stdout.write("ASSET READ ERROR: "+err);return;}
             image.resize(300,300);
             let thisImage = [];
@@ -749,6 +764,7 @@ let assets = {
 
 let solutions = {
     allSolutions:[],
+    lastTime:0,
     currentIteration:0,
     divFactor:0.5,
     callStack:undefined,
@@ -756,7 +772,6 @@ let solutions = {
     currentGroupSolutions:[],
     solveWholeGroup: (group,cb) => {
         solutions.currentGroupSolutions = [];
-        let lastTime = 0;
         let groupCopy = {minX:group.mixX,maxX:group.maxX,minY:group.minY,maxY:group.maxY,color:group.color,binary:group.binary.slice()};
         let totalOverlap = [];
         for(let i=0;i<1000;i++) {
@@ -773,10 +788,12 @@ let solutions = {
             solutions.currentGroupSolutions.push(solution.res);
             thread.currentPixelsScanned+=inclusions-solutions.getInclusions(groupCopy);
             thread.currentObjects++;
-            if((new Date().getTime())-lastTime>1000) {
+            const thisDate = new Date().getTime();
+            if(thisDate-solutions.lastTime>300) {
                 terminal.logVectorStats();
+                solutions.lastTime = new Date().getTime();
             }
-            lastTime = new Date().getTime();
+            
         }
         for(let i=0;i<totalOverlap.length;i++) {
             totalOverlap[i].x+=group.minX;
@@ -1057,6 +1074,6 @@ let solutions = {
         return foundPixels;
     }
 }
-
 exports.start = thread.loadAndInit;
+exports.closeMessage = terminal.closeMessage;
 //thread.start();

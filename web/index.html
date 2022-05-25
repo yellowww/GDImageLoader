@@ -3,18 +3,23 @@
     <head>
         <title>GD Image Loader</title>
         <link rel="stylesheet" href="style.css">
-        <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@600&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap" rel="stylesheet"> 
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500&display=swap" rel="stylesheet">
         <script src="main.js" defer></script>
     </head>
     <body>
-        <div id="descriptionBox"></div>
+        <div id="otherLinkContainer"> 
+            <a href="/help" class="other-link-container">
+                <div class="other-link" >Help</div>  
+            </a>
+            <div class="other-link">Recovery mode</div>
+        </div>
         <div class="title">GEOMETRY DASH IMAGE LOADER</div>
         <div class="sub-title">CONFIGURATION SETTINGS</div>
         <div class="header">If you are unsure what a setting will do or how it will affect the resulting image, just leave it as the default.</div>
         <div style="text-align:center;">
-            <div class="new-config-button" style="background-color:rgb(165,148,100);" id="newConfigButton">Load new image</div>
-            <div class="new-config-button" id="loadConfigButton">Load from save</div>
+            <div class="new-config-button" style="background-color:rgb(165,148,100);border-top-left-radius: 0.3cm;" id="newConfigButton">Load new image</div>
+            <div class="new-config-button" id="loadConfigButton" style="background-color:rgba(165,148,100,0.25);border-top-right-radius: 0.3cm;">Load from save</div>
         </div>
         <div class="seperation-bar"></div>
         <div id="newConfigContainer">
@@ -93,13 +98,16 @@
                 lower = fewer objects<br>
                 This will be dynamicly scaled if 'Quality optimization' is enabled.
             `">?</div><br>
-            <div class="property">Pass threshold (0-1): </div><div class="inputContainer"><input type="number" class="input" value="0.45" id="passThresholdInput"></div>
-            <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
-                The threshold at which solution will be disregarded if there is too much overlap.<br>
-                higher = less artifacting, longer load times<br>
-                lower = fewer objects<br>
-                This will be dynamicly scaled if 'Quality optimization' is enabled.
-            `">?</div><br>
+            <div id="passThresholdContainer" style="filter:opacity(0.4);pointer-events: none;">
+                <div class="property">Pass threshold (0-1): </div><div class="inputContainer"><input type="number" class="input" value="0.45" id="passThresholdInput"></div>
+                <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+                    The threshold at which solution will be disregarded if there is too much overlap.<br>
+                    higher = less artifacting, longer load times<br>
+                    lower = fewer objects<br>
+                    This will be dynamicly scaled if 'Quality optimization' is enabled.
+                `">?</div>
+            </div>
+            <br>
             <div class="property">Bake artifacts: </div><input type="checkbox" class="input-checkbox" id="bakeArtifactsInput">
             <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
                 Artifacts will override correct pixel data, <br>
@@ -151,6 +159,21 @@
             </div> 
         </div>
         <div id="loadConfigContainer" style="display:none;">
+            <div class="property">Save location: </div> <div class="inputContainer">./saves/<input type="text" id="LOADsaveLocation" class="input" placeholder="save name"></div>
+            <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
+                The relative path to the save file you want to load.
+            `">?</div>
+            <br>
+            <img id="saveExample" style="display:none;">
+            <div class="property" id="saveNotFound" style="color:rgb(120,0,0);font-weight: bolder;font-size: 0.6cm;margin-left:4cm;display:none;">Save not found</div>
+            <div class="property" id="noImageBenchmarks" style="color:rgb(0,0,120);font-weight: bolder;font-size: 0.7cm;margin-left:4cm;display:none;">
+                Save found!<br>
+                No Image benchmarks saved.
+            </div>
+
+            <br>
+            <div class="property">&#9135;&#9135;&#9135;&#9135;&#9135;&#9135;</div>
+            <br>
             <div class="property">Create new level: </div><input type="checkbox" class="input-checkbox" id="LOADnewLevelInput">
             <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
                 Load image into a new Geometry Dash level.
@@ -164,7 +187,7 @@
 
             </div>            
             <br>
-            <div class="property">Editor layer: </div> <div class="inputContainer"><input type="number" id="LOADlayerInput" class="input" placeholder="layer" value="0"></div>
+            <div class="property">Editor layer: </div> <div class="inputContainer"><input type="number" id="LOADlayerInput"  class="input" placeholder="layer" value="0"></div>
             <div class="moreInfo" onmouseout="this.innerHTML = '?'" onmouseover="this.innerHTML = `
                 The Geometry Dash editor layer to load the image to.
             `">?</div>
@@ -193,6 +216,7 @@
 
             </div> 
         </div>
+        <div class="header" style="font-size:1cm;padding-bottom:0.2cm;font-weight: bold;color:rgb(40,0,0);-webkit-text-stroke-width: 3px;-webkit-text-stroke-color: rgb(0,0,0);">Make sure Geometry Dash is closed before you click start!<br>Otherwise it will not work.</div>
         <div class="error-text" id="errorOut"style="display:none;"></div>
         <div id="startButton">Start</div>
 

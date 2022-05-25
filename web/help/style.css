@@ -1,0 +1,128 @@
+@font-face {
+    font-family: "oxygene1";
+    src: url("../assets/oxygen1.ttf")
+}
+
+
+body {
+    margin:0;
+    background-color:rgb(30,30,30);
+    overflow: hidden;
+}
+
+.title {
+    font-family: oxygene1;
+    text-align: center;
+    font-size: 2.5cm;
+    width:calc(90vw);
+    padding-left:calc(5vw);
+    padding-top:1.5cm;
+    color:rgb(0, 150, 130);
+    text-shadow: -3px 5px 1px rgb(0, 80, 50);
+    padding-bottom:1.5cm;
+}
+
+.sidebar {
+    display:inline-block;
+    width: 9cm;
+    background-color: rgb(30,30,35);
+    height:calc(100vh - 2.5cm - 3cm);
+    filter:brightness(0.9);
+    position: absolute;
+    transition: filter .2s;
+}
+
+.sidebar:hover {
+    filter:brightness(1);
+}
+
+.sidebar-title {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-weight: bold;
+    font-size: 0.9cm;
+    padding-top:0.75cm;
+    padding-bottom: 1cm;
+    width: 100%;
+    color:rgb(160,160,190);
+    text-align: center;
+}
+
+.sidebar-item {
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-weight: 400;
+    font-size: 0.75cm;
+    padding-top:0.4cm;
+    user-select: none;
+    margin-left:1cm;
+    white-space: nowrap;
+    width: 0;
+    cursor: pointer;
+    border-bottom: 2px solid rgb(30,50,80);
+    color:rgb(100,130,160);
+    transition: width .2s;
+}
+
+.sidebar-item:hover {
+    width: calc(100% - 4cm);
+}
+
+.main-content {
+    display:inline-block;
+    overflow-y: auto;
+    border-top:5px solid rgb(210,210,230);
+    height: calc(100vh - 2.5cm - 3cm);
+    margin-left:9cm;
+    padding-left:1cm;
+    width:calc(100vw - 10cm);
+    background-color: rgb(27,25,25);
+}
+
+.content-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 2cm;
+    margin-left:1.85cm;
+    margin-top:0.5cm;
+    margin-bottom:2cm;
+    color:rgb(210,210,230);
+}
+
+.content-heading {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 400;
+    font-size: 1cm;
+    margin-left:3.5cm;
+    margin-top:1cm;
+    margin-bottom:1cm;
+    color:rgb(210,210,230);
+}
+
+.content-text {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 200;
+    font-size: 0.52cm;
+    margin-left:4cm;
+    width:80%;
+    margin-bottom:0.5cm;
+    color:rgb(210,210,230);
+}
+
+.content-code {
+    display:inline-block;
+    padding:0.25cm;
+    padding-top:0.05cm;
+    padding-bottom:0.05cm;
+    border-radius: 0.25cm;
+    color:rgb(190,190,250);
+    background-color: rgb(47,45,45);
+}
+
+.content-important {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 1cm;
+    margin-left:3cm;
+    margin-top:0.5cm;
+    margin-bottom:2cm;
+    color:rgb(140,30,0);
+}

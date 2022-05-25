@@ -1,3 +1,6 @@
+let newImage = true;
+let saveHash;
+
 document.getElementById("scanWidthInput").onblur = () => {
     const input = document.getElementById("scanWidthInput");
     if (input.value<0) input.value=0;
@@ -68,9 +71,18 @@ document.getElementById("LOADlayerInput").onblur = () => {
 
 
 document.getElementById("startButton").onclick = () => {
-    const json = compileJSON();
+    let json;
+    if(newImage) {
+        json = compileJSON();
+    } else {
+        json = compileLoadJSON();
+    }
     if(json) {
-        document.getElementById("configSubmition").value = JSON.stringify(json);
+        let postContent = {
+            new:newImage,
+            config:json
+        }
+        document.getElementById("configSubmition").value = JSON.stringify(postContent);
         document.getElementById("submitConfigInput").click();
     }
 }
@@ -88,6 +100,24 @@ document.getElementById("newLevelInput").onchange = () => {
 
     }
 }
+
+document.getElementById("lowObjectModeInput").onchange = () => {
+    const active = document.getElementById("lowObjectModeInput").checked;
+    let container =  document.getElementById("passThresholdContainer");
+
+    if(!active) {
+        container.style.filter = "opacity(0.4)";
+        container.style.pointerEvents = "none";
+    } else {
+        container.style.filter = "opacity(1)";
+        container.style.pointerEvents = "all";
+
+    }
+}
+
+
+
+
 
 document.getElementById("densityOverrideInput").onchange = () => {
     const active = document.getElementById("densityOverrideInput").checked;
@@ -132,17 +162,44 @@ document.getElementById("LOADdensityOverrideInput").onchange = () => {
 }
 
 document.getElementById("newConfigButton").onclick = () => {
+    newImage = true;
     document.getElementById("newConfigButton").style.backgroundColor = "rgb(165,148,100)";
-    document.getElementById("loadConfigButton").style.backgroundColor = "rgba(0,0,0,0)";
+    document.getElementById("loadConfigButton").style.backgroundColor = "rgba(165,148,100,0.25)";
     document.getElementById("newConfigContainer").style.display = "block";
     document.getElementById("loadConfigContainer").style.display = "none";
 }
 
 document.getElementById("loadConfigButton").onclick = () => {
+    newImage = false;
     document.getElementById("loadConfigButton").style.backgroundColor = "rgb(165,148,100)";
-    document.getElementById("newConfigButton").style.backgroundColor = "rgba(0,0,0,0)";
+    document.getElementById("newConfigButton").style.backgroundColor = "rgba(165,148,100,0.25)";
     document.getElementById("newConfigContainer").style.display = "none";
     document.getElementById("loadConfigContainer").style.display = "block";
+}
+
+document.getElementById("LOADsaveLocation").onblur = () => {
+    const allSaves = saveHash.map(e=>e.name);
+    const img = document.getElementById("saveExample");
+    const input = document.getElementById("LOADsaveLocation").value;
+    const index = allSaves.indexOf(input);
+    if(index>=0) {
+        if(saveHash[index].hasSaves) {
+            img.src = input+"/PrimSet.png";
+            img.style.display = "block";
+            document.getElementById("saveNotFound").style.display = "none"     
+            document.getElementById("noImageBenchmarks").style.display = "none"         
+        } else {
+            img.style.display = "none";
+            document.getElementById("saveNotFound").style.display = "none"    
+            document.getElementById("noImageBenchmarks").style.display = "block"  
+        }
+
+    } else {
+        document.getElementById("saveNotFound").style.display = "block";
+        document.getElementById("noImageBenchmarks").style.display = "none"  
+        img.style.display = "none";
+    }
+    
 }
 
 const compileJSON = () => {
@@ -173,7 +230,7 @@ const compileJSON = () => {
         ["save location",saveLocation],
         ["resolution width",resWidth],
         ["resolution height", resHeight],
-        ["threshold", threshold],
+        ["compression threshold", threshold],
         ["incorperate threshold", incorperateThreshold],
         ["overlap quality", overlapQuality],
         ["pass threshold",passThreshold],
@@ -191,7 +248,7 @@ const compileJSON = () => {
         `
         return false;
     }
-    return config = {
+    return {
         imagePath:"./"+image,
         gdLevel:level,
         newLevel:newLevel,
@@ -216,9 +273,52 @@ const compileJSON = () => {
     }
 }
 
+const compileLoadJSON = () => {
+    let level = document.getElementById("LOADlevelInput").value;
+    const saveLocation = document.getElementById("LOADsaveLocation").value;  
+    const newLevel = document.getElementById("LOADnewLevelInput").checked;  
+    const editorLayer = document.getElementById("LOADlayerInput").value;
+    const imageWidth = document.getElementById("LOADloadWidthInput").value;
+    const densityOverride = document.getElementById("LOADdensityOverrideInput").checked;
+    let specifiedDensity = densityOverride?document.getElementById("LOADspecifiedDensityInput").value:"NA";
+    if(newLevel) level = "NA";
+    const isNull = checkIfNull([
+        ["level",level],
+        ["save location",saveLocation],
+        ["editor layer",editorLayer],
+        ["image width",imageWidth],
+        ["specified maximum density", specifiedDensity]
+    ]);
+    if(specifiedDensity == "NA") specifiedDensity = false;
+    if(isNull) {
+        document.getElementById("errorOut").style.display="block";
+        document.getElementById("errorOut").innerHTML = `
+            [CONFIG ERROR] setting 
+            '<div style='color:rgb(40,20,60);display:inline-block;'>${isNull}</div>'
+            must be defined.
+        `
+        return false;
+    }
+    return {
+        save:saveLocation,
+        newLevel:newLevel,
+        level:level,
+        editorLayer:editorLayer,
+        width:imageWidth,
+        density:densityOverride
+    }
+}
+
 const checkIfNull = (props) => {
     for(let i=0;i<props.length;i++) {
         if(props[i][1] == "") return props[i][0];
     }
     return false;
 }
+
+const loadSaveHash = () => {
+    fetch("./key.json")
+    .then(res=>res.json())
+    .then(data => saveHash=data);
+}
+loadSaveHash();

@@ -1,6 +1,8 @@
 const fs = require('fs');
 const gd = require("./gd/encoding.js");
-const zlib = require('zlib')
+const zlib = require('zlib');
+const main = require('./main.js');
+const path = require('path');
 
 //square: 1,211,2,x,3,y,6,rot,32,scale,21,1,41,1,43,HaSaVa1a1
 //diamond: 1,211,2,x,3,y,6,(rot-45),32,(scale*0.69),41,1,43,HaSaVa1a1
@@ -15,18 +17,18 @@ let build = {
     parsedObjs:undefined,
     colorChannel:undefined,
     backup:(saveName,levelName,newLevel,cb) => {
-        let gdSave = process.env.HOME || process.env.USERPROFILE + "/AppData/Local/GeometryDash/CCLocalLevels.dat";
+        let gdSave = path.join(process.env.HOME || process.env.USERPROFILE, "AppData\\Local\\GeometryDash\\CCLocalLevels.dat");
         fs.readFile(gdSave, "utf-8", (err,data) => {
             if(err) {console.error("Could not cache backup, GD file not found.");return};
             const fileName = (new Date().getTime()-1652751057920);
-            fs.writeFile(__dirname+"/cache/"+fileName+".dat", data, err=>{if(err)console.error(err)});
-            let key = JSON.parse(fs.readFileSync(__dirname+"/cache/key.json"));
+            fs.writeFile(path.join(__dirname,"cache",fileName+".dat"), data, err=>{if(err)console.error(err)});
+            let key = JSON.parse(fs.readFileSync(path.join(__dirname,"/cache/key.json")));
             key[fileName] = {
                 timeCreated:new Date().getTime(),
                 saveName:saveName,
                 levelName:newLevel? "new level":levelName
             };
-            fs.writeFileSync(__dirname+"/cache/key.json",JSON.stringify(key));
+            fs.writeFileSync(path.join(__dirname,"/cache/key.json"),JSON.stringify(key));
             cb();
         })
     },
@@ -39,7 +41,7 @@ let build = {
             cb();
         });
     },
-    loadIntoLevel:(save,newLevel,levelName, width,layer,densityOverride) => {
+    loadIntoLevel:(save,newLevel,levelName, width,layer,densityOverride,cb) => {
         process.stdout.write(`\x1b[37m\x1b[1mLoading ${save}/ConstructFile.gdi...\x1b[0m`);
 
         build.loadBuildFile(`${save}/ConstructFile.gdi`, () => {
@@ -54,7 +56,8 @@ let build = {
                 build.backup(save,displayName,newLevel,() => {
                     process.stdout.write("\r\x1b[K");
                     process.stdout.write("\x1b[1mBacking up previous files\x1b[0m - Done!\n\n");
-                    build.getSingleLevel(levelName, xml,newLevel);
+                    const loadFailed = !build.getSingleLevel(levelName, xml,newLevel);
+                    if(loadFailed) return;
                     build.getMaxHeight(width,(maxHeight,totalObjects) => {
                         const objectDensity = totalObjects/(width*maxHeight);
                         let targetDensity = false;
@@ -83,7 +86,8 @@ let build = {
                         }
                         
                         console.log("\x1b[1mSucsesfully added\x1b[0m\x1b[35m "+adjustedTotalObjects+"\x1b[0m\x1b[1m objects to \x1b[0m\x1b[35m'"+displayName+"'\x1b[1m\x1b[0m.\x1b[0m");
-                        build.compressToGDFormat();                          
+                        build.compressToGDFormat(); 
+                        cb();                         
                     });
                 });
             });
@@ -139,13 +143,13 @@ let build = {
                     data = build.setCharAt(data,allKeys[i].sIndex,newVal);
                 }
             }
-            const defaultData = fs.readFileSync(__dirname+"/gd/defaultData/level.txt", "utf-8");
+            const defaultData = fs.readFileSync(path.join(__dirname,"gd/defaultData/level.txt"), "utf-8");
             data = data.replace(
                 "<k>LLM_01</k><d><k>_isArr</k><t />",
                 "<k>LLM_01</k><d><k>_isArr</k><t />"+defaultData
             );
             build.remainingData = data;
-            build.remainingParsedData = fs.readFileSync(__dirname+"/gd/defaultData/parsedInfo.txt", "utf-8")
+            build.remainingParsedData = fs.readFileSync(path.join(__dirname,"gd/defaultData/parsedInfo.txt"), "utf-8")
             build.addColorChannel();
             build.parsedObjs = [];
         } else {
@@ -155,8 +159,8 @@ let build = {
             for(let i=1;i<split.length;i++) allNames.push({name:split[i].split("<s>")[1].split("</s>")[0],data:split[i]});
             if(!allNames.map(e=>e.name).includes(level)) {
                 console.error(`Level '${level}' not found.`);
-                process.exitCode = 1;
-                process.exit();
+                main.closeMessage(1);
+                return false;
             }
             dataCpy = build.cutAtChar(dataCpy, "<k>k2</k><s>"+level);
             if(build.getRemoved(dataCpy, "k4</k><s>").includes("<k>k2</k>")) { // has no object data tag.
@@ -172,14 +176,11 @@ let build = {
             decoded = zlib.unzipSync(decoded).toString();
             build.remainingParsedData = build.cutToChar(decoded,"kA11,0;")+"kA11,0;";
             decoded = build.cutAtChar(decoded, "kA11,0;");
-            build.addColorChannel();
+            const colorFail = !build.addColorChannel();
+            if(colorFail) return false;
             build.parsedObjs = decoded.split(';');
-            //build.parsedObjs.pop();
-            //const index = build.parsedObjs.map(e=>Number(e.split("25,")[1].split(",")[0])).indexOf(3334);
-            //console.log(build.parsedObjs[index]);
-            build.parsedObjs = [];
         }
-
+        return true;
     },
     setCharAt:(str,index,chr) => {
         if(index > str.length-1) return str;
@@ -211,13 +212,14 @@ let build = {
         }
         if(nextChannelId >= 1000) {
             console.error("No avalible color channels.");
-            process.exitCode = 1;
-            process.exit();
+            main.closeMessage(1);
+            return false;
         }
         build.colorChannel = nextChannelId;
         allChannels.push(`1_255_2_255_3_255_11_255_12_255_13_255_4_-1_6_${nextChannelId}_7_1_15_1_18_0_8_1`);
         const compiled = before+allChannels.join("|")+"|"+after;
         build.remainingParsedData = compiled;
+        return true;
     },
     cutAtChar:(string,subString) => {
         let copy = string.slice();
