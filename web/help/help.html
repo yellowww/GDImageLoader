@@ -9,6 +9,10 @@
     </head>
     <body>
         <div class="title">GD IMAGE LOADER - HELP</div>
+        <a href="http://localhost:2000/" id="backContainer">
+            <div class="back-button">Back</div>
+        </a>
+        
         <div class="sidebar">
             <div class="sidebar-item" onclick="setFocus('settingsContent')">Settings</div>
             <div class="sidebar-item" onclick="setFocus('errorContent')">Errors</div>
@@ -148,61 +152,172 @@
                     It can take time to process some images so if you want, you can load an image that you already processed directly into another level. <br>
                     Just specify the save name for the image you want to re-add.<br>
                     It will show you a preview of the image if <div class="content-code">Save Image benchmarks</div> was enabled for that save.
+                    <br><br>
                 </div>
             </div>
             <div id="errorContent">
                 <div class="content-title">Errors, Warnings and Problems</div>
                 <div class="content-important">This program was built for windows, it will not work on mac or linux.</div>
 
-                <div class="content-heading">File read/write errors</div>
+                <div class="content-heading content-error">Nothing was added to my GD levels</div>
+                <div class="content-text">
+                    This likley means you had Geometry Dash open when you ran the program. <br>
+                    Close GD and re-run the program.<br>
+                    If it still doesn't work, submit an issue on the <a class="content-anchor" href="https://github.com/yellowww/gdImageLoader" target="_blank">github page</a>.
+                </div>
+
+                <div class="content-heading content-error">File read/write errors</div>
                 <div class="content-text">
                     If you recieve any errors that mention not being able to read, write, or find files, you should check the permissions of the 
                     <div class="content-code">GDImageLoader.sh</div> file.<br> Make sure it has acsess to the disk that Geometry Dash is located on.<br> 
                     If it still doesn't work, try removeing and reinstalling the program to a different location.<br>
-                    If the issue still persists, submit an issue on the github page.
+                    If the issue still persists, submit an issue on the <a class="content-anchor" href="https://github.com/yellowww/gdImageLoader" target="_blank">github page</a>.
                 </div>
 
-                <div class="content-heading">Error! Could not open or find GD save file</div>
+                <div class="content-heading content-error">Error! Could not open or find GD save file</div>
                 <div class="content-text">
                     This likley means Geometry Dash is not installed in the proper place, <br>
                     or the <div class="content-code">GDImageLoader.sh</div> file does not have proper permissions.<br>
                     Follow instructions for <div class="content-code">File read/write errors</div>.
                 </div>
                 
-                <div class="content-heading">Save directory warning</div>
+                <div class="content-heading content-warn">Save directory warning</div>
                 <div class="content-text">
                     If you get a warning that says <div class="content-code">filepath ____ already exists</div>, it means that you already have a save folder by that name. <br>
                     The program will over-write all the data of the previous save at that location.
                 </div>
 
-                <div class="content-heading">Object density warning</div>
+                <div class="content-heading content-warn">Object density warning</div>
                 <div class="content-text">
                     This warning means that the program had to remove objects from the result image to prevent the level from crashing.<br>
                     For a better looking image, decrease the quality or increase the <div class="content-code">Image width</div>.<br><br>
                     If your level does not open follow instructions for <div class="content-code">I can't open my level</div>.
                 </div>
 
-                <div class="content-heading">All my levels disappeared</div>
+                <div class="content-heading content-error">All my levels disappeared</div>
                 <div class="content-text">
                     This is almost certianly a big in the program.<br>
                     Restore a backup by running the <div class="content-code">Recovery.sh</div> file.<br>
-                    Submit an issue on the github page.
+                    Submit an issue on the <a class="content-anchor" href="https://github.com/yellowww/gdImageLoader" target="_blank">github page</a>.
                 </div>
 
-                <div class="content-heading">I can't open my level</div>
+                <div class="content-heading content-error">I can't open my level</div>
                 <div class="content-text">
                     First restore a backup by running the <div class="content-code">Recovery.sh</div> file.<br>
                     Then when you try to load the image again, in the configuration, enable <div class="content-code">Override auto density ballencing</div>, then decrease <div class="content-code">Specified maximum density</div>.<br>
                     If it still does not open, repeat this step and decrease <div class="content-code">Specified maximum density</div> even more.
                 </div>
 
-                <div class="content-heading">Other errors</div>
+                <div class="content-heading"><br><br>Other issues</div>
                 <div class="content-text">
-                    If you expireienced an error not mentioned here, submit an issue on the github page.<br>
+                    If you expireienced a problem not mentioned here, submit an issue on the <a class="content-anchor" href="https://github.com/yellowww/gdImageLoader" target="_blank">github page</a>.<br>
+                    <br><br>
                 </div>
             </div>
             <div id="procedureContent">
                 <div class="content-title">Procedure</div>
+                <div class="content-large">
+                    This program can be broken up into 3 major parts:
+                    <div class="content-focus">Compression</div>,
+                    <div class="content-focus">Conversion</div>, and
+                    <div class="content-focus">Construction</div>.
+                </div>
+                <div class="content-heading large">Compression:</div>
+                <div class="content-text">
+                    The first and easiest step is loading the input image into a bitmap, then compressing that bitmap's colors to assist with conversion.<br><br>
+                    The program will load the image into a bitmap with dimentions of <div class="content-code">scanResX</div>*<div class="content-code">scanResY</div>.<br>
+                    After this is done, the program scans every pixel and if the color is withing <div class="content-code">compressionThreshold</div>% of a neighbor pixel, they will be combined into a color group.<br><br>
+                    When this process is finished, there may be some pixels that were never combined into a color group.<br>
+                    If <div class="content-code">Enchance details</div> is enabled, it will create a new color group for each of these single pixels.<br>
+                    If it is not enabled, the pixel will be combined with a nearby group.<br>
+                    This can cause horizontal artifacting if your <div class="content-code">compression threshold</div> is too low, as this behaviour will ocour for many neighboring pixels.
+                </div>
+                <div class="content-heading large">Conversion:</div>
+                <div class="content-text">
+                    The goal of this next step is to convert the raster data of the compressed image, into a set of geometric primitives (circles, squares, triangles).<br>
+                    This is acomplished by having the raster data go under many transformations, until it is comparable with these primitives.<br><br>
+
+                    When the color groups exit the compression phase, they are stored as a bitmap of pointers (Each for the corisponding pixel), pointing to a color, stored as sperate data.<br>
+                    The first transformation is turing this set of pointers into color groups repersented as objects that contain all the pixels of the group as well as the color.<br>
+                    <img class="content-image" src="../assets/help/transform0.png"><br>
+                    After this transformation, the <div class="content-code">incorperate threshold</div> is integrated.<br><br><br>
+                    
+                    The next transformation is from these group objects, to bounded groups.<br>
+                    Bounded groups are repersented by the bounds of the group relative to the image, and a binary bitmap of these bounds, showing which pixels in the bounds belong to the color group.<br><br>
+                    This is important because of the way the geometric primitive references are loaded and stored.<br>
+                    <img class="content-image" src="../assets/help/transform1.png"><br><br><br>
+
+                    Next we want to sort this array of bound groups from least to greatest based on the amount of pixels they have.<br>
+                    This will greatly increase the quality of the result if <div class="content-code">Bake artifacts</div> is enabled.
+                    <br><br><br><br>
+
+                    <div class="medium">Now we need to this array of bound groups into an array of primitive objects.</div><br><br>
+                    We can do this by comparing the groups to reference primitives. <br>
+                    These reference image are located in <div class="content-code">./assets/</div>. If you want you can add other image to this directory, and they will automaticly be used in future image loads.
+                    <div style="display:inline-block;font-weight:bold">You will also need to add a way to convert them to GD objects in </div><div class=content-code>./build.js</div>.<br><br>
+                    
+                    These reference Images are also loaded into binary bitmaps, just like the bound groups. <br><br>
+                    
+                    This program creates new primitives, and tries to fit them inside these bound groups. A new primitive that is loaded is refered to as a "solution".<br>
+                    This will look something like this:<br>
+                    <img class=" content-image small-image" src="../assets/help/solutionSyntax.png"><br>
+                    We can then grade how well a solution solves a bound group.<br>
+                    We do this by finding the total number of overlapping pixels, as well as how many pixels overlap with a different group.<br>
+                    We want the former to be larger, while the latter smaller.<br><br>
+
+                    Now that we can grade solutions, we can start improving the solutions.<br>
+                    A solution can be improved by maximizing the overlapping pixels, while minimizing the overlap with other groups.<br>
+                    We can improve a solution by sampling the scores when it moved left, right, up and down.<br>
+                    We can then reposition the solution based on the results from the samples until the solution is in the optimal position.<br><br>
+
+                    Finding the optimal scale is more difficult.<br>
+                    This is because if the number of pixels overlapping with the group is low, we want to increase the scale.<br>
+                    But, if the number of pixels overlapping with other groups is high, we want to decrease the scale.<br>
+                    We can implement a feedback mechanism to bounce back and forth between increasing and decreasing the scale, until it will eventualy come to an equilibrium.<br><br><br>
+
+                    Now we have the optimal solution given an asset and bound group.<br>
+                    We can run this algorithm on each asset that we have to find the best solution for a given group.<br><br>
+                    There are also some settings that can influence the output of this algorithm, such as the <div class="content-code">Overlap quality</div>.<br>
+                    This setting controls the starting scale of a solution.<br>
+                    Generaly, the greater this value, the smaller the resulting solution will be. This means that the resulting image quality will be higher, but there will be more objects used.<br><br>
+
+                    We can get even better results by recursing over the function to find the optimal solution.<br>
+                    Recursing is determined by <div class="content-code">Quality optimization</div>.
+                    Every recursion iteration, we can mutate the <div class="content-code">Overlap quality</div>, as well as the starting position of the solution.<br>
+                    We can then track the ending score of the iteration, and if it is greater than the score from the previous iteration, it will return that solution.<br>
+                    When recursing we can also reject solutions that do now have a satisfactory score. The rejection threshold is determined by <div class="content-code">Pass threshold</div>.<br><br><br>
+
+                    We can then repeat this function on a bound group, until all of the pixels are covered by the geometric primitives.<br>
+                    Now we have an algorithm that can turn a bound group into a set of primitives from <div class="content-code">./assets/</div>.<br><br><br>
+
+                    Next, all we have to do is run this algorithm on every bound group, then compile every solution and save it to the <div class="content-code">save location</div> as <div class="content-code">ConstructFile.gdi</div>.<br><br><br>
+
+                    Some other files are saved as well, such as<br><br>
+                    <strong>Comp.png:</strong> An save from after compression.<br>
+                    <strong>PrimSet.png:</strong> An image contructed from the final primitives.<br>
+                    <strong>Standard.png:</strong> A standard raster image with the same amount of pixels as objects in PrimSet.png<br>
+                    <strong>Stats.json:</strong> A record of the configuration used, process times, process scores, and reference primitives used.
+                </div>
+                <div class="content-heading large">Construction:</div>
+                <div class="content-text">
+                    The final step is to take the ConstructFile.gdi generated in step 2, and load it into Geometry Dash.<br>
+                    The encription of Geometry dash levels has been cracked for Windows. It is still unknown how to decode levels on Mac, or Linux.<br><br>
+
+                    On windows they can be decoded by running your save file through a xor cypher with a key of 11, converting it from base-64 and then, then running it through z-lib decompression.<br>
+                    This will give you an xml plist.
+                    We can then decode this plist into different levels. Finally you can extract the object data by converting key value pair <div class="content-code">k4</div> from base-64 and running it through z-lib decompression again.<br><br>
+
+                    Now we need to turn our <div class="content-code">ConstructFile.gdi</div> into Geometry Dash objects. The coordinates and scale for primitives are stored relative to the width they will be loaded at, so we just need to scale them up based on the <div class="content-code">Image width</div>.<br>
+                    Now we can turn these primitives into GD object strings.<br>
+                    We can compress and insert this string back into the save file, and then re-encode the file.<br>
+                    Once we replace the old save file with the new one, the image should be loaded into your level.<br><br>
+                    
+                    One interesting issue with Geometry Dash, is that if you have too many objects close together, the level will not open.<br>
+                    This program has some automatic systems to make sure it does not pass this limit by randomly removing objects if it does pass the limit.<br>
+                    Sometimes it miscalucates and your level will not open, if this happens follow the steps in the <div class="content-code">Errors</div> to fix it.<br><br><br>
+
+                    <div class="medium">That's it!</div>
+                </div>
             </div>
         </div> 
 

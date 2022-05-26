@@ -7,3 +7,7 @@
     document.getElementById("mainContent").scrollTop = 0;
 })("settingsContent")
 
+const urlParms = new URLSearchParams(window.location.search);
+const isFromHome = urlParms.get("fromHome");
+
+if(isFromHome == null) document.getElementById("backContainer").style.display = "none"; 

@@ -32,7 +32,7 @@ const encodeSave = (data) => {
     gzip = gzip.replace(/\+/g, "-");
     const xor = crypto.xor(gzip,11);
     console.log(`\x1b[36m\x1b[1mUpdated GD save files\x1b[0m\x1b[36m | File size: \x1b[34m\x1b[47m${Math.round(xor.length/1000)}kb\x1b[0m`);
-    console.log("\x1b[31m\x1b[1mIf this program did not work properly and broke your level, run the \x1b[4mRestore\x1b[0m\x1b[1m\x1b[31m file to revert changes.\x1b[0m ")
+    console.log("\x1b[31m\x1b[1mIf this program did not work properly and broke your level, run the \x1b[4mRecovery.sh\x1b[0m\x1b[1m\x1b[31m file to revert changes.\x1b[0m ")
 
     fs.writeFile(gdSave, xor, (err) => {if(err)console.log(err)});
     return xor;

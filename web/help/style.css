@@ -22,6 +22,32 @@ body {
     padding-bottom:1.5cm;
 }
 
+.back-button {
+    position: absolute;    
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-weight: bold;
+    font-size: 0.9cm;
+    left:1cm;
+    top:0.5cm;
+    user-select: none;
+    white-space: nowrap;
+    width: 0;
+    height:0;
+    padding-left:0.25cm;
+    cursor: pointer;
+    border-top: 4px solid rgba(20, 83, 177, 0);
+    border-left: 4px solid rgba(20, 83, 177, 0);
+    color:rgb(105, 153, 200);
+    transition: width .35s, height .35s, border-top-color .45s, border-left-color .45s;
+}
+
+.back-button:hover {
+    border-top-color:rgba(19, 49, 94,1);
+    border-left-color:rgba(19, 49, 94,1);
+    width: 2.2cm;
+    height:1.15cm;
+}
+
 .sidebar {
     display:inline-block;
     width: 9cm;
@@ -125,4 +151,76 @@ body {
     margin-top:0.5cm;
     margin-bottom:2cm;
     color:rgb(140,30,0);
+}
+
+.content-anchor {
+    font-weight: 600;
+    padding:0.15cm;
+    padding-top:0.05cm;
+    padding-bottom:0.05cm;
+    border-radius: 0.25cm;
+    color:rgb(130,0,200);
+    background-color: rgba(47,45,45,0);
+    transition: background-color .35s;
+}
+
+.content-anchor:hover {
+    background-color: rgba(47,45,45,0.6);
+}
+
+.content-anchor:active {
+    background-color: rgba(47,45,45,1);
+}
+
+.content-error {
+    display:inline-block;
+    border-bottom: 0.15cm solid rgb(140,30,0);
+}
+
+.content-warn {
+    display:inline-block;
+    border-bottom: 0.15cm solid rgb(160,160,0);
+}
+
+.content-large {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+    font-size: 0.8cm;
+    width:calc(100% - 3.5cm);
+    margin-left:3cm;
+    margin-top:0.5cm;
+    margin-bottom:2cm;
+    color:rgb(210,210,230);
+}
+
+.content-focus {
+    display: inline-block;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 300;
+    font-size: 0.8cm;
+    color:rgb(147, 147, 202);
+}
+
+.large {
+    font-size: 1.2cm;
+}
+
+.medium {
+    font-size:0.8cm;
+}
+
+
+
+.content-image {
+    width:60%;
+    min-width: 2cm;
+    margin-top:0.55cm;
+    margin-left:0.3cm;
+    border-radius: 0.1cm;
+    max-width: 25cm;
+}
+
+.small-image {
+    width:40%;
+    max-width: 15cm;
 }
