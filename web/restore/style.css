@@ -1,0 +1,218 @@
+@font-face {
+    font-family: "oxygene1";
+    src: url("../assets/oxygen1.ttf")
+}
+
+body {
+    margin:0;
+    background-color:rgb(30,30,30);
+    overflow-x: hidden;
+}
+
+.title {
+    font-family: oxygene1;
+    text-align: center;
+    font-size: 2.5cm;
+    width:calc(90vw);
+    padding-left:calc(5vw);
+    padding-top:1.5cm;
+    color:rgb(0, 150, 130);
+    text-shadow: -3px 5px 1px rgb(0, 80, 50);
+    padding-bottom:1.5cm;
+}
+
+.main-content {
+    width:90vw;
+    margin-left:5vw;
+    overflow: auto;
+    margin-top:0cm;
+}
+
+.content-header {
+    color:rgb(210,210,230);
+    font-family: poppins, sans-serif;
+    text-align: center;
+    font-size:1.5cm;
+    height:8.2cm;
+}
+
+.content-info {
+    font-size: 0.6cm;
+    color:rgb(170,150,0);
+}
+
+.content-text {
+    color:rgb(120,130,100);
+    margin-bottom: 0.5cm;
+    font-family: poppins, sans-serif;
+    font-size: 0.9cm;
+    text-align: center;
+}
+
+.content-error {
+    color:rgb(160,60,60);
+    font-weight: bold;
+    margin-bottom: 0.5cm;
+    font-family: poppins, sans-serif;
+    font-size: 0.75cm;
+    float:left;
+    margin-left:3cm;
+}
+
+.content-image {
+    height:8cm;
+    border-radius: 0.5cm;
+    border:4px solid rgb(210,210,230);
+    float:left;
+    margin-left:3cm;
+}
+
+.content-focus {
+    background-color: rgb(40, 40, 76);
+    padding-left:0.25cm;
+    color:rgb(170,170,170);
+    font-weight: 500;
+    padding-right: 0.25cm;
+    border-radius: 0.25cm;
+    display:inline-block;
+}
+
+.bold {
+    color:rgb(170,170,170);
+    font-weight: 500;
+    display:inline-block;
+}
+
+#restoreButton {
+    font-family: poppins, sans-serif;
+    font-size: 1cm;
+    color:rgb(210,210,230);
+    font-weight: bold;
+    background-color: rgb(30,120,230);
+    width: 6.5cm;
+    padding-top:0.2cm;
+    padding-bottom:0.2cm;
+    border-radius: 0.3cm;
+    cursor: pointer;
+    margin-top:3cm;
+    text-align: center;
+    float:right;
+    user-select: none;
+    transition: background-color .25s;
+}
+
+#restoreButton:hover {
+    background-color: rgb(40,135,250);
+}
+
+
+#warningContainer {
+    width:100vw;
+    height:100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(5,5,7,0.7);
+}
+
+.message-container {
+    width:20cm;
+    height:12cm;
+    position:absolute;
+    top:calc(50vh - 6cm);
+    left:calc(50vw - 10cm);
+    background-color: rgb(180,180,180);
+    border-radius: 0.4cm;
+}
+
+.warning-title {
+    font-size: 1.4cm;
+    margin-top:0.4cm;
+    margin-bottom:1cm;
+    text-align: center;
+    font-family: poppins, sans-serif;
+    font-weight: bold;
+    color:rgb(30,30,32);
+}
+
+.small {
+    font-weight: 400;
+    width:90%;
+    margin-left: 5%;
+    font-size: 0.75cm;
+}
+
+.button {
+    width:4cm;
+    border-radius: 0.4cm;
+    font-size: 0.8cm;
+    margin-top:3cm;
+    text-align: center;
+    padding:0.1cm;
+    font-family: poppins, sans-serif;
+    cursor: pointer;
+    transition: filter .25s;
+    user-select: none;
+}
+
+.button:hover {
+    filter:brightness(0.9);
+}
+
+.back-button {
+    background-color: rgb(140,140,140);
+    margin-left:3cm;
+}
+
+.continue-button {
+    background-color: rgb(140,140,140);
+    margin-right:1.5cm; 
+    float:right;
+    margin-top:0;
+    width:7cm;
+    background-color:rgb(30,120,230);
+    transform:translate(0,-1.3cm);
+}
+
+.dropdown-container {
+    display:inline-block;
+    width:15cm;
+    background-color: rgb(40,35,35);
+    border-radius: 0.3cm;
+    transform: translate(0,0.3cm);
+}
+
+.dropdown-option-container {
+    max-height: 0cm;
+    width:15cm;
+    overflow-y: auto;
+    transition: max-height .2s;
+}
+
+.dropdown-option-container::-webkit-scrollbar {
+    display: none;
+}
+
+.dropdown-content {
+    font-size: 1cm;
+    color:rgb(0, 150, 130);
+    font-weight: 500;
+    background-color: rgb(45,40,40);
+    border-radius: 0.3cm;
+    user-select: none;
+    cursor: pointer;
+}
+
+
+
+.dropdown-option {
+    font-size: 0.7cm;
+    color:rgb(0, 150, 130);
+    margin-bottom: 0.2cm;
+    cursor: pointer;
+    user-select: none;
+}
+
+.dropdown-option:hover {
+    background-color: rgba(200,180,180,0.05);
+}

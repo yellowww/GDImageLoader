@@ -9,6 +9,44 @@ body {
     overflow-x: hidden;
 }
 
+#recoveryContent {
+    width:100vw;
+    height:100vh;
+    position: absolute;
+    top:0;
+    left:0;
+    background-color: rgba(5,5,7,0.85);
+    z-index: 2;
+}
+
+.recovery-message {
+    width:18cm;
+    padding-left:3.5cm;
+    padding-right:3.5cm;
+    height:5cm;
+    padding-top:3cm;
+    padding-bottom:3cm;
+    position: absolute;
+    left:calc(50vw - 12.5cm);
+    top:calc(50vh - 5.5cm);
+    background-color: rgb(170,170,170);
+    border-radius: 0.5cm;
+    font-size: 1.25cm;
+    font-family: 'Space Mono', monospace;
+    text-align: center;
+    font-weight: bolder;
+
+}
+
+.content-code {
+    background-color: rgb(0,30,80);
+    display:inline-block;
+    color:rgb(210,210,210);
+    padding-left:0.5cm;
+    padding-right:0.5cm;
+    border-radius: 0.5cm;
+}
+
 .title {
     font-family: oxygene1;
     text-align: center;

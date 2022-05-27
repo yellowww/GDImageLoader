@@ -16,7 +16,7 @@ let build = {
     decodedLevel:undefined,
     parsedObjs:undefined,
     colorChannel:undefined,
-    backup:(saveName,levelName,newLevel,cb) => {
+    backup:(saveName,levelName,newLevel,stats,cb) => {
         let gdSave = path.join(process.env.HOME || process.env.USERPROFILE, "AppData\\Local\\GeometryDash\\CCLocalLevels.dat");
 
         let key = JSON.parse(fs.readFileSync(path.join(__dirname,"/cache/key.json")));
@@ -39,7 +39,8 @@ let build = {
             key[fileName] = {
                 timeCreated:new Date().getTime(),
                 saveName:saveName,
-                levelName:newLevel? "new level":levelName
+                levelName:newLevel? "new level":levelName,
+                stats:stats.toString()
             };
             fs.writeFileSync(path.join(__dirname,"/cache/key.json"),JSON.stringify(key));
             cb();
@@ -66,7 +67,7 @@ let build = {
                 process.stdout.write("\x1b[1mDecoding GD save file\x1b[0m - Done!\n\n");
                 process.stdout.write("\x1b[1mBacking up previous files\x1b[0m");
                 let displayName = newLevel ? "Image To GD":levelName;
-                build.backup(save,displayName,newLevel,() => {
+                build.backup(save,displayName,newLevel,fs.readFileSync(`${save}/Stats.json`),() => {
                     process.stdout.write("\r\x1b[K");
                     process.stdout.write("\x1b[1mBacking up previous files\x1b[0m - Done!\n\n");
                     const loadFailed = !build.getSingleLevel(levelName, xml,newLevel);

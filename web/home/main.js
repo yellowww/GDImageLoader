@@ -1,5 +1,21 @@
 let newImage = true;
 let saveHash;
+let rcModeOpen = false;
+const openRcMode = () => {
+    if(!rcModeOpen) {
+        document.getElementById("recoveryContent").style.display = "block";
+        document.body.style.overflowY = "hidden";
+        window.scrollTo(0,0);
+        setTimeout(()=>rcModeOpen=true,20);
+    }
+}
+document.body.onclick = () => {
+    if(rcModeOpen) {
+        document.getElementById("recoveryContent").style.display = "none";
+        document.body.style.overflowY = "auto";
+        setTimeout(()=>rcModeOpen=false,20);
+    }
+}
 
 document.getElementById("scanWidthInput").onblur = () => {
     const input = document.getElementById("scanWidthInput");

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>GD Image Loader - Recovery</title>
+        <link rel="stylesheet" href="restore/style.css"> 
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+        <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
+        <script src="restore/script.js" defer></script>
+    </head>
+    <body>
+        <div class="title">GD IMAGE LOADER - RECOVERY</div>
+        <div class="main-content">
+            <div class="content-header">
+                <div class="content-info">To conserve space, only the last 15 backups are saved.</div>
+                <div style="vertical-align:top;display:inline-block">Select backup:</div>
+                <div class="dropdown-container">
+                    <div class="dropdown-content">backup</div>
+                    <div class="dropdown-option-container"></div>
+                </div>
+                
+            </div>
+            <div class="content-text" id="backupDescription"></div>
+            <div class="content-text" id="backupDate"></div>
+            <div style="margin-top:2cm;display:none;" id="lowerContent">
+                <div class="content-error" id="imageInfo"></div>
+                <img id="savePreview" class="content-image">
+                <div id="restoreButton" onclick="openWarning()">Restore!</div>
+            </div>
+            <div id="warningContainer" style="display:none;">
+                <div class="message-container">
+                    <div class="warning-title">Are you sure?</div>
+                    <div class="warning-title small">This process is irreversible.<br>Your current levels will be over-written</div>
+                    <div class="button back-button" onclick="closeWarning()">Back</div>
+                    <div class="button continue-button" onclick="submit()">Yes, over-write</div>
+                </div>
+            </div>
+        </div>
+        <form action="start" method="post"  style="display:none;">
+            <input type="text" name="backup" id="submitDataField">
+            <input type="submit" id="submitDataInput">
+        </form>
+    </body>
+</html>

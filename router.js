@@ -10,7 +10,7 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'web')));
-app.use(express.static(path.join(__dirname, 'saves')))
+app.use(express.static(path.join(__dirname, 'saves')));
 
 app.get("/", (req,res) => {
     fs.readFile(__dirname+"/web/home/home.html", "utf-8", (err, html) => {

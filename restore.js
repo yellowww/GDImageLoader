@@ -1,13 +1,60 @@
 const fs = require('fs');
 const path = require('path');
+const express = require('express');
+const bodyParser = require("body-parser");
 
-const restore = (id) => {
+const restore = (id,cb) => {
     fs.readFile(path.join(__dirname, "/cache",id+".dat"), 'utf-8', (err,file) => {
         if(err) return console.error(err)
         let gdSave = path.join(process.env.HOME || process.env.USERPROFILE, "AppData\\Local\\GeometryDash\\CCLocalLevels.dat");
         fs.writeFile(gdSave,file,err=>{if(err)return console.error(err)});
         process.stdout.write("sucsessfully loaded backup.\n");
+        cb();
     })    
 }
 
-restore('261268508');
+
+const app = express();
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'web')));
+app.use(express.static(path.join(__dirname, 'saves')))
+
+app.get("/", (req,res) => {
+    fs.readFile(path.join(__dirname,"web/restore/restore.html"), "utf-8", (err, html) => {
+        if(err) {console.error(err);return};
+        res.send(html);
+    });
+});
+
+app.get("/backupKey", (req,res)=> {
+    res.send(fs.readFileSync(path.join(__dirname,"cache/key.json")).toString());
+})
+
+app.post("/start",(req,res) => {
+    console.log("\nstarting backup process...")
+    let parsed = req.body.backup;
+    fs.readFile(path.join(__dirname,"web/restore/finished.html"), "utf-8", (err, html) => {
+        if(err) {console.error(err);return};
+        res.send(html);
+
+        restore(parsed, () => {
+            process.stdout.write("\n\x1b[2mPress any key to close program...\x1b[0m\n");
+            const readline = require('readline');
+
+            readline.emitKeypressEvents(process.stdin);
+            process.stdin.setRawMode(true);
+
+            process.stdin.on('keypress', (str, key) => {
+                process.exitCode = 0;
+                process.exit();
+            })
+        });
+    });
+})
+
+app.listen(2002, () => {
+    process.title = "GD Image Loader - Recovery";
+    console.log('\n\x1b[33mNavigate to the the window opened\x1b[0m');
+})
