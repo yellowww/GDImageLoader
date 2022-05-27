@@ -88,8 +88,33 @@ body {
     transition: width .2s;
 }
 
-.sidebar-item:hover {
+.sidebar-hover:hover {
     width: calc(100% - 4cm);
+}
+
+.sidebar-text {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 0.65cm;
+    padding-top:0.4cm;
+    margin-left:1cm;
+    white-space: nowrap;
+    color:rgb(100,130,160);
+    transition: width .2s;
+}
+
+.sidebar-fixed {
+    font-family: 'Poppins', sans-serif;
+
+    position: fixed;
+    
+    bottom: 1cm;
+}
+
+.sidebar-link {
+    color:rgb(148, 36, 208);    
+    border-bottom-width: 3px;
+    font-weight: 500;
 }
 
 .main-content {

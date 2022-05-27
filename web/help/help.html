@@ -4,7 +4,10 @@
         <title>GD Image Loader - Help</title>
         <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@300;400&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+        <link href="help/style.css" rel="stylesheet">
+        <script src="help/script.js" defer></script>
         <link href="style.css" rel="stylesheet">
+        <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
         <script src="script.js" defer></script>
     </head>
     <body>
@@ -14,9 +17,13 @@
         </a>
         
         <div class="sidebar">
-            <div class="sidebar-item" onclick="setFocus('settingsContent')">Settings</div>
-            <div class="sidebar-item" onclick="setFocus('errorContent')">Errors</div>
-            <div class="sidebar-item" onclick="setFocus('procedureContent')">Procedure</div>
+            <div class="sidebar-item sidebar-hover" onclick="setFocus('settings')">Settings</div>
+            <div class="sidebar-item sidebar-hover" onclick="setFocus('error')">Errors</div>
+            <div class="sidebar-item sidebar-hover" onclick="setFocus('procedure')">Procedure</div>
+            <div class="sidebar-text sidebar-fixed" style="bottom:2.2cm;">@amyellow</div><br>
+            <a href="https://github.com/yellowww/gdImageLoader">
+               <div class="sidebar-item sidebar-hover sidebar-fixed sidebar-link">Github</div> 
+            </a>
         </div>
         <div class="main-content" id="mainContent">
             <div id="settingsContent">

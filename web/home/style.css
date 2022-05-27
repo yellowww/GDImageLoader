@@ -1,0 +1,239 @@
+@font-face {
+    font-family: "oxygene1";
+    src: url("../assets/oxygen1.ttf")
+}
+
+body {
+    margin:0;
+    background-color:burlywood;
+    overflow-x: hidden;
+}
+
+.title {
+    font-family: oxygene1;
+    text-align: center;
+    font-size: 2.5cm;
+    width:calc(90vw - 6cm);
+    padding-left:calc(5vw);
+    padding-top:1.5cm;
+    color:rgb(0,50,100);
+    text-shadow: -3px 5px 1px black;
+    padding-bottom:1.5cm;
+}
+
+.sub-title {
+    font-family: oxygene1;
+    text-align: center;
+    font-size: 1.5cm;
+    width:80vw;
+    margin-left:10vw;
+    color:rgb(104, 81, 0);
+    margin-bottom:1cm;
+}
+
+.return-to-terminal {
+    font-family: 'Fira Code', monospace;    
+    text-align: center;
+    font-size: 1.75cm;
+    font-weight: bold;
+    width:80vw;
+    margin-top:4cm;
+    margin-left:2.5vw;
+    padding-left:7.5vw;
+    padding-right:7.5vw;
+    padding-bottom: 2cm;
+    color:rgb(1, 9, 80);
+}
+
+.error-text {
+    font-family: 'Fira Code', monospace;    
+    text-align: center;
+    font-size: 0.65cm;
+    width:80vw;
+    margin-left:10vw;
+    color:rgb(139, 7, 7);
+}
+
+.header {
+    font-family: 'Fira Code', monospace;    
+    text-align: center;
+    font-size: 0.75cm;
+    width:80vw;
+    margin-left:2.5vw;
+    padding-left:7.5vw;
+    padding-right:7.5vw;
+    padding-bottom: 2cm;
+    color:rgb(80, 63, 1);
+}
+
+.new-config-button {
+    font-family: 'Fira Code', monospace; 
+    font-size:0.9cm;
+    display:inline-block;
+    margin-right:-5px;
+    padding:0.5cm;
+    margin-left:0px;
+    padding-top:0.2cm;
+    cursor:pointer;
+    padding-bottom:0.1cm;
+    user-select: none;
+    transform:translate(-2.5px,0);
+}
+
+#otherLinkContainer {
+    right:0;
+    display:block;
+    position: absolute;
+    width:6cm;
+    padding:0.5cm;
+    background-color:rgb(193, 173, 119);
+    border-bottom-left-radius: 0.5cm;
+}
+
+.other-link-container {
+    text-decoration: none;
+    color: rgb(0,0,0);
+}
+
+.other-link {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7cm;
+    user-select: none;
+    cursor: pointer;
+    width:0;
+    white-space: nowrap;
+    border-bottom: 0.1cm solid rgb(0,150,230);
+    transition: width .2s, color .2s;
+    border-radius: 5%;
+    font-weight: bold;
+}
+
+.other-link:hover {
+    width:100%;
+    color:rgb(0,90,150)
+}
+
+.seperation-bar {
+    width:80vw;
+    margin-bottom:2cm;
+    padding-left:7.5vw;
+    padding-right:7.5vw;
+    margin-left:2.5vw;
+    border-bottom: 2px solid rgb(80, 63, 1);
+}
+
+.property {
+    font-size: 0.75cm;
+    margin-left:3cm;
+    color:rgb(30, 30, 30);
+    font-family: 'Space Mono', monospace;
+    display:inline-block;
+    margin-bottom: 1.5cm;
+}
+
+#saveExample {
+    margin-left:5cm;
+    height:7.5cm;
+    border:5px solid rgb(0,30,80);
+    border-radius: 0.3cm;
+    max-width:70vw;
+}
+
+.inputContainer {
+    border:2px solid black;
+    font-size:0.65cm;
+    border-radius: 3px;
+    background-color: rgb(240,240,200);
+    font-family: 'Space Mono', monospace;
+    display:inline-block;
+}
+
+.input {
+    font-size:0.65cm;
+    outline: none;
+    border:none;
+    background-color: rgb(240,240,200);
+    font-family: 'Space Mono', monospace;
+    display:inline-block;
+}
+
+.input-checkbox {
+    width:0.75cm;
+    cursor: pointer;
+    margin-left:0.45cm;
+    height:0.75cm;
+    transform: translate(0,0.125cm);
+}
+
+.moreInfo {
+    display: inline-block;
+    position: absolute;
+    margin-left:1cm;
+    background-color: rgba(150,150,150,0.5);
+    cursor: default;
+    border-radius: 0.5cm;
+    padding-left:0.3cm;
+    padding-right:0.3cm;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75cm;
+    max-width: 15cm;
+    z-index: 0;
+}
+
+.moreInfo:hover {
+    font-size: 0.5cm;
+    border-radius: 0.2cm;
+    background-color: rgb(150,150,150);
+    z-index: 1;
+}
+
+.description {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.5cm;
+    background-color:rgba(220,220,220,0.5);
+    display:inline-block;
+    margin-top:-1.5cm;
+    margin-bottom:1.5cm;
+    border-radius: 0.5cm;
+    padding:0.5cm;
+    border-top-left-radius: 0;
+    margin-left:3.5cm;
+}
+
+#startButton {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.5cm;
+    width:7.5cm;
+    margin-left:calc(50vw - 3.25cm);
+    margin-bottom: 3cm;
+    cursor:pointer;
+    margin-top: 1cm;
+    border-radius: 0.75cm;
+    text-align: center;
+    background-color: rgb(0,180,200);
+    filter: drop-shadow(0px 0.4cm 0px rgb(0,30,80));
+    transition: transform .15s, filter .15s;
+    user-select: none;
+}
+
+#startButton:hover {
+    transform: translate(0px, 0.1cm);
+    filter: drop-shadow(0px 0.3cm 0px rgb(0,30,80));
+}
+
+#startButton:active {
+    transform: translate(0px, 0.4cm);
+    filter: drop-shadow(0px 0cm 0px rgb(0,30,80));
+}
+
+.close-text {
+    font-family: 'Fira Code', monospace;    
+    position: absolute;
+    text-align: center;
+    font-size: 1.25cm;
+    font-weight: bold;
+    width:80vw;
+    bottom:4cm;
+    left:10vw;
+    color:rgb(0, 104, 148);
+}

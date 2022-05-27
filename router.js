@@ -13,7 +13,7 @@ app.use(express.static(path.join(__dirname, 'web')));
 app.use(express.static(path.join(__dirname, 'saves')))
 
 app.get("/", (req,res) => {
-    fs.readFile(__dirname+"/web/index.html", "utf-8", (err, html) => {
+    fs.readFile(__dirname+"/web/home/home.html", "utf-8", (err, html) => {
         if(err) {console.error(err);return};
         res.send(html);
     });
@@ -32,7 +32,7 @@ app.post("/submitConfig", (req,res) => {
     else builder.loadConstruct("./saves/"+parsed.config.save, parsed.config.newLevel,parsed.config.level,parsed.config.width,parsed.config.editorLayer,parsed.config.density,()=> {
         setTimeout(()=>main.closeMessage(0),100);
     });
-    fs.readFile(__dirname+"/web/finished.html", "utf-8", (err, html) => {
+    fs.readFile(__dirname+"/web/home/finished.html", "utf-8", (err, html) => {
         if(err) {console.error(err);return};
         res.send(html);
     });

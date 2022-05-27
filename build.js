@@ -18,11 +18,24 @@ let build = {
     colorChannel:undefined,
     backup:(saveName,levelName,newLevel,cb) => {
         let gdSave = path.join(process.env.HOME || process.env.USERPROFILE, "AppData\\Local\\GeometryDash\\CCLocalLevels.dat");
+
+        let key = JSON.parse(fs.readFileSync(path.join(__dirname,"/cache/key.json")));
+
+        const allSaves = fs.readdirSync(path.join(__dirname,"cache"));
+        const orderedSaves = allSaves.sort((a,b)=>a.split('.')[0]-b.split('.')[0]);
+        orderedSaves.pop();
+        if(orderedSaves.length>14) {
+            for(let i=0;i<orderedSaves.length-14;i++) {
+                fs.unlinkSync(path.join(__dirname,"cache",orderedSaves[i]));
+                delete key[orderedSaves[i].split('.')[0]];
+            }
+        }
+
         fs.readFile(gdSave, "utf-8", (err,data) => {
             if(err) {console.error("Could not cache backup, GD file not found.");return};
             const fileName = (new Date().getTime()-1652751057920);
             fs.writeFile(path.join(__dirname,"cache",fileName+".dat"), data, err=>{if(err)console.error(err)});
-            let key = JSON.parse(fs.readFileSync(path.join(__dirname,"/cache/key.json")));
+
             key[fileName] = {
                 timeCreated:new Date().getTime(),
                 saveName:saveName,
