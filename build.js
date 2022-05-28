@@ -229,8 +229,9 @@ let build = {
             main.closeMessage(1);
             return false;
         }
+        process.stdout.write(`Image is using \x1b[36mcolor channel \x1b[1m${nextChannelId}\x1b[0m\n\n`)
         build.colorChannel = nextChannelId;
-        allChannels.push(`1_255_2_255_3_255_11_255_12_255_13_255_4_-1_6_${nextChannelId}_7_1_15_1_18_0_8_1`);
+        allChannels.push(`1_255_2_255_3_255_11_254_12_254_13_254_4_-1_6_${nextChannelId}_7_1_15_1_18_0_8_1`);
         const compiled = before+allChannels.join("|")+"|"+after;
         build.remainingParsedData = compiled;
         return true;
