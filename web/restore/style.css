@@ -95,6 +95,7 @@ body {
     border-radius: 0.3cm;
     cursor: pointer;
     margin-top:3cm;
+    margin-bottom:2cm;
     text-align: center;
     float:right;
     user-select: none;
@@ -142,11 +143,19 @@ body {
     font-size: 0.75cm;
 }
 
+.error {
+    font-weight: bold;
+    color:rgb(99, 38, 38);
+    display:inline-block;
+    font-size: 1cm;
+    margin-top:0.5cm;
+}
+
 .button {
     width:4cm;
     border-radius: 0.4cm;
     font-size: 0.8cm;
-    margin-top:3cm;
+    margin-top:1.5cm;
     text-align: center;
     padding:0.1cm;
     font-family: poppins, sans-serif;

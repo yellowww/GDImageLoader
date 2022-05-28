@@ -62,6 +62,7 @@ const selectOption = () => {
     let errorDisplay = document.getElementById("imageInfo");
     let savePreview = document.getElementById("savePreview");
     if(saveKey.map(e=>e.name).includes(saveName)) {
+        if(saveKey[saveKey.map(e=>e.name).indexOf(saveName)].hasSaves) {
         fetch(`${saveName}/Stats.json`)
             .then(res=>res.json())
             .then(stats=>{
@@ -74,7 +75,12 @@ const selectOption = () => {
                     errorDisplay.innerHTML = "Outdated Image preview.";
                     errorDisplay.style.display = "block";
                 }
-            });
+            });            
+        } else {
+            savePreview.style.display = "none";
+            errorDisplay.innerHTML = "Could not find image preview.";
+            errorDisplay.style.display = "block";            
+        }
     } else {
         savePreview.style.display = "none";
         errorDisplay.innerHTML = "Could not find image preview.";

@@ -19,7 +19,6 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'web')));
-app.use(express.static(path.join(__dirname, 'saves')))
 
 app.get("/", (req,res) => {
     fs.readFile(path.join(__dirname,"web/restore/restore.html"), "utf-8", (err, html) => {
@@ -52,9 +51,34 @@ app.post("/start",(req,res) => {
             })
         });
     });
-})
+});
 
-app.listen(2002, () => {
-    process.title = "GD Image Loader - Recovery";
-    console.log('\n\x1b[33mNavigate to the the window opened\x1b[0m');
-})
+const loadSaveKey = (cb) => {
+    fs.readdir("./saves",(err,files) => {
+        if(err) console.error(err);
+        files.splice(files.indexOf("key.json"),1);
+        let hash = [];
+        for(let i=0;i<files.length;i++) {
+            fs.readdir("./saves/"+files[i],(err,nestedFiles) => {
+                if(err) console.error(err);
+                hash.push({
+                    name:files[i],
+                    hasSaves:nestedFiles.includes("Comp.png")
+                });
+                
+            })
+        }
+        setTimeout(()=> {
+            fs.writeFile("./saves/key.json",JSON.stringify(hash),(err) => {if(err)console.error(err)})
+            cb();
+        },150);
+    });
+}
+loadSaveKey(() => {
+    app.use(express.static(path.join(__dirname, 'saves')))
+    app.listen(2002, () => {
+        process.title = "GD Image Loader - Recovery";
+        console.log('\n\x1b[33mNavigate to the the window opened\x1b[0m');
+    }); 
+});
+
