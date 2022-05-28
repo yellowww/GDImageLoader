@@ -47,4 +47,6 @@ It will try to turn groups of pixels into primitive objects, such as triangles, 
 
 > View [config](github/assets/catExample) used to create these images 
 
+You can also configure the program to load high quality images while still maintaining relatively low object counts.
+
 The results you get may vary based on your configuration. It may take some time tuning the values to maximize the efectiveness of this render system.
