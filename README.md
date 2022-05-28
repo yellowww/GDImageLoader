@@ -12,10 +12,9 @@
 
  1. Download and unzip this repository or clone it to your computer
 
- 1. Open a command prompt and run `node 'absolutePath'/main.js` to start the program.<br>
-    You can get the absolute path by shift + right clicking the file and selecting "copy as path"
+ 2. Run the `GDImageLoader.sh` file by double-clicking to start the program.
 
- 1. Follow the prompts to load the image into your geometry dash level.
+ 3. Follow the prompts to load the image into your geometry dash level.
 <br>
 
 ---
@@ -26,7 +25,7 @@ Most other Geometry Dash image loaders use standard rendering, loading each pixe
 
 This program optimizes the amount of objects used, as well as the quality of the image through raster vectorization. 
 <br>
-It will try to turn groups of pixels into primitive objects, such as triangles, circles, and squares. This will ultimatly lead to a much lower object count, while still maintaining quality.
+It will try to turn groups of pixels into primitive objects, such as triangles, circles, and squares. This will ultimatly lead to a much lower object count, while still maintaining a higher quality.
 
 <table>
     <tr width="500">
@@ -42,7 +41,7 @@ It will try to turn groups of pixels into primitive objects, such as triangles, 
         </td>
     </tr>
     <td align="center" colspan="2">
-       Both of these use 3,826 objects
+       Both of these use 4,144 objects
     </td>
 </table>
 
