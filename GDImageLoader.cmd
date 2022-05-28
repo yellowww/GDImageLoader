@@ -1,5 +1,5 @@
-#!/bin/bash
-printf '\033[8;35;150t'
+@ECHO OFF
+mode con:cols=150 lines=35
 
 start chrome --new-window --app=http://localhost:2000
 
