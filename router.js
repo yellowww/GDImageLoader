@@ -58,7 +58,28 @@ const loadSaveKey = () => {
         },150);
     });
 }
+
 loadSaveKey();
+
+
+let hasAttemptedExit = false;
+const logExit = (error,domain) => {
+    if(hasAttemptedExit) return;
+    hasAttemptedExit = true;
+    const f = JSON.parse(fs.readFileSync("./logs/exit.json"));
+    f.push({err:error,stack:error.stack, domain:domain, timestamp:new Date().getTime()});
+    fs.writeFileSync("./logs/exit.json", JSON.stringify(f));
+    process.exit(1);
+}
+
+process.on('uncaughtException', logExit);
+
+process.on('exit', logExit);
+process.on('SIGINT', logExit);
+process.on('SIGUSR1', logExit);
+process.on('SIGUSR2', logExit);
+
+
 process.title = "GD Image Loader"
 process.stdout.write("\033[8;150;400");
 console.log("\n\x1b[1m\x1b[36m\n   -------------------\n   | GD Image Loader |\n   -------------------\x1b[0m\n")
