@@ -321,7 +321,7 @@ const compileLoadJSON = () => {
         level:level,
         editorLayer:editorLayer,
         width:imageWidth,
-        density:densityOverride
+        density:specifiedDensity
     }
 }
 
