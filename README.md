@@ -12,7 +12,7 @@
 
  1. Download and unzip this repository or clone it to your computer
 
- 2. Run the `GDImageLoader.cmd` file by double-clicking to start the program.
+ 2. Run the `GDImageLoader.bat` file by double-clicking to start the program.
 
  3. Follow the prompts to load the image into your geometry dash level.
 <br>
